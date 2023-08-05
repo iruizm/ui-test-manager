@@ -1,4 +1,4 @@
-package pkg
+package model
 
 type Sequence struct {
 	fileName   string
