@@ -1,16 +1,19 @@
 package api
 
 import (
+	"fmt"
+	"os"
+	"path/filepath"
 	"polonium/internal/pkg/configuration"
 )
 
-func setConfiguration(configPath string) {
-	configuration.Setup(&configPath)
-}
-
-func Run(configPath string) {
-	if configPath == "" {
-		configPath = "data/config.json"
+func Run() {
+	configPath := ""
+	apiDir, err := os.Getwd()
+	if err != nil {
+		fmt.Println("Error getting API directory:", err)
+		os.Exit(1)
 	}
-	setConfiguration(configPath)
+	configPath = filepath.Join(apiDir, "..", "..", "data", "config.json")
+	configuration.Setup(&configPath)
 }

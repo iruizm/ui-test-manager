@@ -1,7 +1,7 @@
 package model
 
 type Sequence struct {
-	fileName   string
-	id         string
-	precedents []string
+	FileName   string
+	Id         string
+	Precedents []*Sequence
 }

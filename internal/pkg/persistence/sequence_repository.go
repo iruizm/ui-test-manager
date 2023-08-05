@@ -16,12 +16,15 @@ type SequenceMap struct {
 
 var sequenceMap *SequenceMap
 
-func getSequenceMap() *SequenceMap {
+func GetSequenceMap() *SequenceMap {
 	if sequenceMap == nil {
 		file, errRead := os.ReadFile(configuration.Config.SequencesPath)
 		if errRead != nil {
 			if os.IsNotExist(errRead) {
-				sequenceMap = &SequenceMap{}
+				sequenceMap = &SequenceMap{
+					MapData: make(map[string]interface{}),
+					mu:      sync.Mutex{},
+				}
 
 				jsonData, errMarshal := json.Marshal(sequenceMap)
 				if errMarshal != nil {
@@ -49,8 +52,26 @@ func getSequenceMap() *SequenceMap {
 	return sequenceMap
 
 }
+func (s *SequenceMap) AddSequence(sequence *model.Sequence) {
+	sequences := GetSequenceMap()
+	sequences.mu.Lock()
+	defer sequences.mu.Unlock()
 
-func (s *SequenceMap) addSequence(sequence *model.Sequence) error {
-	//sequences := getSequenceMap()
-	return nil
+	sequences.MapData[sequence.Id] = sequence
+	s.saveMap()
+
+}
+
+func (s *SequenceMap) saveMap() {
+
+	jsonData, errMarshal := json.Marshal(&s)
+	if errMarshal != nil {
+		fmt.Println("Error marshaling initial data:", errMarshal)
+		return
+	}
+
+	if errWrite := os.WriteFile(configuration.Config.SequencesPath, jsonData, 0644); errWrite != nil {
+		fmt.Println("Error writing initial data to file:", errWrite)
+		return
+	}
 }
