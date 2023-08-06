@@ -14,6 +14,6 @@ func Run() {
 		fmt.Println("Error getting API directory:", err)
 		os.Exit(1)
 	}
-	configPath = filepath.Join(apiDir, "..", "..", "data", "config.json")
+	configPath = filepath.Join(apiDir, "..", "..", "configs", "config.json")
 	configuration.Setup(&configPath)
 }
