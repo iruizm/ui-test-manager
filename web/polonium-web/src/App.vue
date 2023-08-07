@@ -1,21 +1,55 @@
-<script setup>
-import HelloWorld from './components/HelloWorld.vue'
-import TheWelcome from './components/TheWelcome.vue'
-</script>
-
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
+  <div>
+    <h1>Element Table</h1>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Value</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="(element, index) in elements" :key="index">
+          <td>{{ element.name }}</td>
+          <td>{{ element.value }}</td>
+          <td>
+            <button @click="removeElement(index)">Remove</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
 
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-    </div>
-  </header>
+    <button @click="addElement">Add Element</button>
 
-  <main>
-    <TheWelcome />
-  </main>
+    <button @click="openFileManager">Add Files...</button>
+    <input type="file" ref="fileInput" style="display: none" @change="addElements" />
+
+  </div>
 </template>
+
+<script>
+export default {
+  data() {
+    return {
+      elements: [],
+      fileManagerOpen: false
+    };
+  },
+  methods: {
+    addElements(event) {
+      console.log(event.target.files)
+      this.elements.concat(event.target.files)
+    },
+    removeElement(index) {
+      this.elements.splice(index, 1);
+    },
+    openFileManager() {
+      this.$refs.fileInput.click();
+    },
+  }
+};
+</script>
 
 <style scoped>
 header {
