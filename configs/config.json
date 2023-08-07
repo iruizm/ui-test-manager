@@ -1,3 +1,4 @@
 {
-    "sequences_path": "../../data/sequences.json"  
+    "sequences_path": "../../data/sequences.json",
+    "logging_path": "../../data/api.log"
 }

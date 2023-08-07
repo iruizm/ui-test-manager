@@ -10,6 +10,7 @@ var Config *Configuration
 
 type Configuration struct {
 	SequencesPath string `json:"sequences_path"`
+	LoggingPath   string `json:"logging_path"`
 }
 
 func Setup(configPath *string) {

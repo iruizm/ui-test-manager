@@ -18,7 +18,7 @@ type SequenceMap struct {
 
 var sequenceMap *SequenceMap
 
-func AddSequence(sequence *model.Sequence) {
+func SaveSequence(sequence *model.Sequence) {
 	sequences := getSequenceMap()
 	sequences.mu.Lock()
 	defer sequences.mu.Unlock()
@@ -27,14 +27,13 @@ func AddSequence(sequence *model.Sequence) {
 
 }
 
-func RemoveSequence(sequence *model.Sequence) {
+func RemoveSequence(id *uuid.UUID) {
 	sequences := getSequenceMap()
 	sequences.mu.Lock()
 	defer sequences.mu.Unlock()
 
-	delete(sequences.MapData, sequence.Id)
+	delete(sequences.MapData, *id)
 	sequences.saveMap()
-
 }
 
 func getSequenceMap() *SequenceMap {
