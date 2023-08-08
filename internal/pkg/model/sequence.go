@@ -3,16 +3,16 @@ package model
 import "github.com/google/uuid"
 
 type Sequence struct {
-	FileName   string
+	Name       string
 	Id         uuid.UUID
 	Precedents []*Sequence
 }
 
-func NewSequence(fileName string) *Sequence {
+func NewSequence(name string) *Sequence {
 	var a Sequence
 
 	a.Id = uuid.New()
-	a.FileName = fileName
+	a.Name = name
 	a.Precedents = []*Sequence{}
 
 	return &a

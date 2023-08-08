@@ -9,14 +9,6 @@ import (
 	"github.com/google/uuid"
 )
 
-type UserInput struct {
-	Username  string `json:"username" binding:"required"`
-	Lastname  string `json:"lastname"`
-	Firstname string `json:"firstname"`
-	Password  string `json:"password" binding:"required"`
-	Role      string `json:"role"`
-}
-
 // SaveSequence godoc
 // @Summary Saves a Sequence
 // @Description Save Sequence given Sequence data
@@ -31,7 +23,7 @@ func SaveSequence(c *gin.Context) {
 	var json model.Sequence
 	err := c.ShouldBindJSON(&json)
 	if err != nil {
-		id := c.Param("file_name")
+		id := c.Param("name")
 		if id == "" {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		}
