@@ -39,6 +39,6 @@ func Setup() *gin.Engine {
 	app.POST("/api/sequence/remove", RemoveSequence)
 	// ================== Docs Routes
 	app.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-
+	app.Run(":8020")
 	return app
 }
