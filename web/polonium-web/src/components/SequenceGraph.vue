@@ -1,52 +1,46 @@
 <template>
   <div>
-    <div id="graph"></div>
-    <button @click="addNode">Add Node</button>
+    <div ref="networkContainer" style="width: 800px; height: 600px;"></div>
   </div>
 </template>
 
 <script>
-import { Network } from "vis-network/standalone/esm/vis-network.esm";
-import "vis-network/styles/vis-network.css";
-
+import { ref, inject } from 'vue';
+import { Network } from 'vis-network';
+import { DataSet } from 'vis-data';
 export default {
-  data() {
-    return {
-      nodes: new vis.DataSet([]),
-      edges: new vis.DataSet([]),
-      network: null
-    };
-  },
-  methods: {
-    addNode() {
-      const newNodeId = this.nodes.length + 1;
-      this.nodes.add({ id: newNodeId, label: `Node ${newNodeId}` });
-    },
-    addEdge(event) {
-      const fromNode = this.network.getSelectedNodes()[0];
-      const toNode = event.nodes[0];
-      if (fromNode !== toNode) {
-        this.edges.add({ from: fromNode, to: toNode });
-      }
-    }
-  },
+  name: 'SequenceGraph',  
   mounted() {
-    const container = document.getElementById("graph");
-    const data = {
-      nodes: this.nodes,
-      edges: this.edges
-    };
-    const options = {};
-    this.network = new Network(container, data, options);
-    this.network.on("click", this.addEdge);
+    this.networkContainer = ref(null);
+    if (this.networkContainer.value) {
+      // Create a dataset for nodes and edges
+      const nodes = new DataSet([
+        { id: 1, label: 'Node 1' },
+        { id: 2, label: 'Node 2' },
+        // Add more nodes...
+      ]);
+
+      const edges = new DataSet([
+        { from: 1, to: 2 },
+        // Add more edges...  
+      ]);
+
+      const data = { nodes, edges };
+
+      const options = {
+        // Configure options...
+      };
+
+      new Network(networkContainer.value, data, options);
+    }
+
   }
 };
 </script>
 
-<style>
-/* You can add any custom styles here */
-#graph {
+<style scoped>
+.network-container {
   width: 100%;
-  height: 400px;
+  height: 500px;
 }
 </style>

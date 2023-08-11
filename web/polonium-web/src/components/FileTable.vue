@@ -23,6 +23,8 @@
 </template>
 
 <script>
+import {inject} from 'vue';
+
 export default {
     name: 'FileTable',
     data() {
@@ -31,14 +33,15 @@ export default {
         };
     },
     mounted() {
+        this.eventBus = inject('$eventBus');
         this.loadAll()
-        this.emitter.on("dataLoaded", isOpen => {
+        this.eventBus.on("dataLoaded", isOpen => {
             this.isOpen = isOpen;
         })
     },
     methods: {
         async loadAll() {
-            this.emitter.emit("toggle-sidebar", this.sidebarOpen);
+            this.eventBus.emit("toggle-sidebar", this.sidebarOpen);
         },
         async addElements(event) {
             for (var i = 0; i < event.target.files.length; i++) {
