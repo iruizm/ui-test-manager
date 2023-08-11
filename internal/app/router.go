@@ -33,12 +33,10 @@ func Setup() *gin.Engine {
 	}))
 	app.Use(gin.Recovery())
 
-	// Routes
-	// ================== Login Routes
+	app.GET("/api/sequences", GetSequences)
 	app.POST("/api/sequence/save", SaveSequence)
 	app.POST("/api/sequence/remove", RemoveSequence)
 	// ================== Docs Routes
 	app.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-	app.Run(":8020")
 	return app
 }

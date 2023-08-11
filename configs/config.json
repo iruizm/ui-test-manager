@@ -1,4 +1,5 @@
 {
     "sequences_path": "../../data/sequences.json",
-    "logging_path": "../../data/api.log"
+    "logging_path": "../../data/api.log",
+    "port": "localhost:8080"
 }

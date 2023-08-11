@@ -9,16 +9,11 @@ import (
 	"github.com/google/uuid"
 )
 
-// SaveSequence godoc
-// @Summary Saves a Sequence
-// @Description Save Sequence given Sequence data
-// @ID save-sequence
-// @Produce json
-// @Param fileName string true "File Name"
-// @Param id uuid.UUID false "Sequence ID"
-// @Param precedents []*Sequence false "Precedents"
-// @Success 200 {object} model.Sequence
-// @Router /api/sequence/save/
+func GetSequences(c *gin.Context) {
+	sequences := persistence.GetSequences()
+	c.JSON(http.StatusOK, *sequences)
+}
+
 func SaveSequence(c *gin.Context) {
 	var json model.Sequence
 	err := c.ShouldBindJSON(&json)
@@ -34,14 +29,6 @@ func SaveSequence(c *gin.Context) {
 	c.JSON(http.StatusOK, json.Id.String())
 }
 
-// SaveSequence godoc
-// @Summary Removes a Sequence
-// @Description Remove Sequence given Sequence ID
-// @ID remove-sequence
-// @Produce json
-// @Param id uuid.UUID true "Sequence ID"
-// @Success 200 {object} model.Sequence
-// @Router /api/sequence/remove/
 func RemoveSequence(c *gin.Context) {
 
 	id, err := uuid.Parse(c.Param("id"))

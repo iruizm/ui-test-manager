@@ -4,6 +4,7 @@
 
 Develop a framework that allows the user to bridge the gap between recording UI tests in Selenium IDE and having a functional testing suite.
 
+Web application, Vue.js 
 ##############################
 
 ## COMPONENTS
@@ -11,6 +12,9 @@ Develop a framework that allows the user to bridge the gap between recording UI 
 ### Backend
 
 Developed in Go. Process recordings, structure them based on a coherent order, fix possible errors, and generate a runnable test suite.
+
+getSequences:
+    Returns the sequences in persistence
 
 addSequence:
     Obtains a recording, adds it to the recording pool, and generates an entry in a map. Save the map serialized to a json.

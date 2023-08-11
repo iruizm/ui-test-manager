@@ -18,6 +18,12 @@ type SequenceMap struct {
 
 var sequenceMap *SequenceMap
 
+func GetSequences() *map[uuid.UUID]interface{} {
+	sequences := getSequenceMap()
+	return &sequences.MapData
+
+}
+
 func SaveSequence(sequence *model.Sequence) {
 	sequences := getSequenceMap()
 	sequences.mu.Lock()
