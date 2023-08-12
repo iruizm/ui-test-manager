@@ -1,6 +1,7 @@
 <script>
 import axios from 'axios';
 import { inject } from 'vue';
+import store from '../store/store'
 
 export default {
   data() {

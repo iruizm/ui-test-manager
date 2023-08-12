@@ -5,12 +5,14 @@
             <thead>
                 <tr>
                     <th>Name</th>
+                    <th>Premises</th>
                     <th>Action</th>
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="(element, index) in elements" :key="index">
+                <tr v-for="(element, index) in store" :key="index">
                     <td>{{ element.name }}</td>
+                    <td>{{ element.premises }}</td>
                     <td>
                         <button @click="removeElement(index)">Remove</button>
                     </td>
@@ -24,13 +26,14 @@
 
 <script>
 import {inject} from 'vue';
+import {store} from '../data/store.js'
 
 export default {
     name: 'FileTable',
-    data() {
-        return {
-            elements: [],
-        };
+    setup() {
+        return{
+            store    
+        }
     },
     mounted() {
         this.eventBus = inject('$eventBus');
@@ -47,16 +50,17 @@ export default {
             for (var i = 0; i < event.target.files.length; i++) {
                 const file = event.target.files[i]
                 const fileContent = await this.readFile(file);
-                this.elements.push({
+                store.push({
                     fileName: file.name,
                     name: file.name.split(".")[0],
                     id: null,
-                    value: fileContent
+                    value: fileContent,
+                    premises : []
                 });
             }
         },
         removeElement(index) {
-            this.elements.splice(index, 1);
+            this.store.splice(index, 1);
         },
         openFileManager() {
             this.$refs.fileInput.click();

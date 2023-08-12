@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div ref="networkContainer" style="width: 800px; height: 600px;"></div>
+    <div ref="container" style="width: 800px; height: 600px;"></div>
   </div>
 </template>
 
@@ -8,10 +8,13 @@
 import { ref, inject, onMounted } from 'vue';
 import { Network } from 'vis-network';
 import { DataSet } from 'vis-data';
+import {store} from '../data/store.js'
+
 export default {
   name: 'SequenceGraph',
   setup() {
-    const networkContainer = ref(null);
+    const eventBus = inject('$eventBus');
+    const container = ref(null);
     let network = null;
 
     onMounted(() => {
@@ -37,11 +40,16 @@ export default {
         edges: edges,
       };
 
-      network = new Network(networkContainer.value, data, options);
+      network = new Network(container.value, data, options);
+
+      network.on("click", function(event) {
+        console.log(store.length)
+      });
+    
     });
 
     return {
-      networkContainer,
+      container, store
     };
   },
 };
