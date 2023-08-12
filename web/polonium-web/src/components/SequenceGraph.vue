@@ -5,36 +5,45 @@
 </template>
 
 <script>
-import { ref, inject } from 'vue';
+import { ref, inject, onMounted } from 'vue';
 import { Network } from 'vis-network';
 import { DataSet } from 'vis-data';
 export default {
-  name: 'SequenceGraph',  
-  mounted() {
-    this.networkContainer = ref(null);
-    if (this.networkContainer.value) {
-      // Create a dataset for nodes and edges
+  name: 'SequenceGraph',
+  setup() {
+    const networkContainer = ref(null);
+    let network = null;
+
+    onMounted(() => {
+      // Define nodes and edges
       const nodes = new DataSet([
         { id: 1, label: 'Node 1' },
         { id: 2, label: 'Node 2' },
-        // Add more nodes...
+        { id: 3, label: 'Node 3' },
       ]);
 
       const edges = new DataSet([
         { from: 1, to: 2 },
-        // Add more edges...  
+        { from: 2, to: 3 },
+        { from: 3, to: 1 },
       ]);
 
-      const data = { nodes, edges };
+      // Set up options for the network
+      const options = {};
 
-      const options = {
-        // Configure options...
+      // Create the network
+      const data = {
+        nodes: nodes,
+        edges: edges,
       };
 
-      new Network(networkContainer.value, data, options);
-    }
+      network = new Network(networkContainer.value, data, options);
+    });
 
-  }
+    return {
+      networkContainer,
+    };
+  },
 };
 </script>
 
