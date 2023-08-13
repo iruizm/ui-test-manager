@@ -1,41 +1,54 @@
 <script>
 import axios from 'axios';
-import { inject } from 'vue';
-import store from '../store/store'
+import { inject, ref, onMounted } from 'vue';
+import { store } from '../data/store.js'
 
 export default {
-  data() {
-    return {
-      responseData: null,
-    };
-  },
-  mounted() {
-    const eventBus = inject('$eventBus');
-    this.fetchData()
-    this.eventBus.on("get-data", async data => {
+  name: 'Client',
+  setup() {
+    const apiClient = ref(null);
+    const eventBus = inject('$eventBus')
+    onMounted(() => {
+      getSequences()
+    });
+
+    eventBus.on("get-sequences", async data => {
+      console.log(this.getSequences())
+    });
+
+    const getSequences = async () => {
       try {
-        const response = await axios.get();
-        this.responseData = response.data;
+        console.log("AHAHAHA")
+        const res = await axios.get('http://localhost:8080/api/sequences');
+        console.log(response)
+        return response.data;
       } catch (error) {
         console.error('Error fetching data:', error);
       }
-    });
-  },
-  methods: {
-    async fetchData() {
+    }
+    const saveSequence = async (json) => {
       try {
-        const response = await axios.get('http://localhost:8080/api/sequences');
+        const res = await axios.get('http://localhost:8080/api/sequence/add', json);
         console.log(response)
         this.responseData = response.data;
       } catch (error) {
         console.error('Error fetching data:', error);
       }
-    },
-  },
-  mounted() {
-    this.fetchData();
-  },
-};
+    }
+    const removeSequence = async (json) => {
+      try {
+        const res = await axios.post('http://localhost:8080/api/sequence/remove', json);
+        console.log(response)
+        this.responseData = response.data;
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    }
 
 
+    return {
+      getSequences, saveSequence, removeSequence
+    };
+  }
+}
 </script>

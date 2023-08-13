@@ -46,6 +46,5 @@ User opens App.
 User links recordings within the Order Screen view of recordings, to set pre-conditions and order. 
 Order Screen can be viewed as nodes or as json with pre-condition field.
 
-
-
-
+### FEATURES
+Add button to view content of file (See vue)

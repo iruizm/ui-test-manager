@@ -25,26 +25,26 @@
 </template>
 
 <script>
-import {inject} from 'vue';
-import {store} from '../data/store.js'
+import { inject, onMounted } from 'vue';
+import { store } from '../data/store.js'
 
 export default {
     name: 'FileTable',
     setup() {
-        return{
-            store    
-        }
-    },
-    mounted() {
-        this.eventBus = inject('$eventBus');
-        this.loadAll()
-        this.eventBus.on("dataLoaded", isOpen => {
-            this.isOpen = isOpen;
+        const eventBus = inject('$eventBus');
+        onMounted(() => {
+            eventBus.on("dataLoaded", isOpen => {
+                this.isOpen = isOpen;
+            })
         })
+        return {
+            store
+        }
     },
     methods: {
         async loadAll() {
-            this.eventBus.emit("toggle-sidebar", this.sidebarOpen);
+            //this.eventBus.emit("toggle-sidebar", this.sidebarOpen);
+            this.eventBus.emit("get-sequences")
         },
         async addElements(event) {
             for (var i = 0; i < event.target.files.length; i++) {
@@ -55,7 +55,7 @@ export default {
                     name: file.name.split(".")[0],
                     id: null,
                     value: fileContent,
-                    premises : []
+                    premises: []
                 });
             }
         },

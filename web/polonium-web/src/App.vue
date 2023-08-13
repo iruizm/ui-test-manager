@@ -1,9 +1,10 @@
 <script setup>
 import FileTable from '@/components/FileTable.vue'
 import SequenceGraph from '@/components/SequenceGraph.vue'
+import Client from '@/components/Client.vue'
 
 const components = {
-  SequenceGraph
+  SequenceGraph, FileTable, Client
 }
 </script>
 
@@ -13,6 +14,7 @@ const components = {
   </header>
 
   <main>
+    <Client/>
     <div class="wrapper">
       <FileTable />
     </div>
