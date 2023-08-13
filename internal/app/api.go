@@ -17,5 +17,5 @@ func Run() {
 	configPath = filepath.Join(apiDir, "configs", "config.json")
 	configuration.Setup(&configPath)
 	backend := Setup()
-	backend.Run(configuration.Config.Port)
+	backend.Run("localhost:" + configuration.Config.BackPort)
 }

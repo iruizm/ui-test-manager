@@ -6,6 +6,7 @@ import (
 	"os"
 	"polonium/internal/pkg/configuration"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -14,7 +15,10 @@ import (
 func Setup() *gin.Engine {
 	app := gin.New()
 
-	// Logging to a file.
+	config := cors.DefaultConfig()
+	config.AllowOrigins = []string{"http://localhost:" + configuration.Config.FrontPort}
+	app.Use(cors.New(config))
+
 	f, _ := os.Create(configuration.Config.LoggingPath)
 	gin.DefaultWriter = io.MultiWriter(f)
 
@@ -34,9 +38,11 @@ func Setup() *gin.Engine {
 	app.Use(gin.Recovery())
 
 	app.GET("/api/sequences", GetSequences)
-	app.POST("/api/sequence/save", SaveSequence)
-	app.POST("/api/sequence/remove", RemoveSequence)
+	app.POST("/api/sequences/save", SaveSequence)
+	app.DELETE("/api/sequences/remove", RemoveSequence)
+
 	// ================== Docs Routes
 	app.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
 	return app
 }

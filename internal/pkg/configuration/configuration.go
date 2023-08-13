@@ -11,7 +11,8 @@ var Config *Configuration
 type Configuration struct {
 	SequencesPath string `json:"sequences_path"`
 	LoggingPath   string `json:"logging_path"`
-	Port          string `json:"port"`
+	BackPort      string `json:"back_port"`
+	FrontPort     string `json:"front_port"`
 }
 
 func Setup(configPath *string) {

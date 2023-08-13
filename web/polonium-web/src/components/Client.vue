@@ -20,15 +20,15 @@ export default {
       try {
         console.log("AHAHAHA")
         const res = await axios.get('http://localhost:8080/api/sequences');
-        console.log(response)
-        return response.data;
+        console.log(res)
+        return res.data;
       } catch (error) {
         console.error('Error fetching data:', error);
       }
     }
     const saveSequence = async (json) => {
       try {
-        const res = await axios.get('http://localhost:8080/api/sequence/add', json);
+        const res = await axios.get('http://localhost:8080/api/sequences/add', json);
         console.log(response)
         this.responseData = response.data;
       } catch (error) {
@@ -37,7 +37,7 @@ export default {
     }
     const removeSequence = async (json) => {
       try {
-        const res = await axios.post('http://localhost:8080/api/sequence/remove', json);
+        const res = await axios.post('http://localhost:8080/api/sequences/remove', json);
         console.log(response)
         this.responseData = response.data;
       } catch (error) {

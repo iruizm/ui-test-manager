@@ -48,3 +48,5 @@ Order Screen can be viewed as nodes or as json with pre-condition field.
 
 ### FEATURES
 Add button to view content of file (See vue)
+
+Implement CORS
