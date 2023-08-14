@@ -33,7 +33,7 @@ func SaveSequence(sequence *model.Sequence) {
 
 }
 
-func RemoveSequence(id *uuid.UUID) {
+func DeleteSequence(id *uuid.UUID) {
 	sequences := getSequenceMap()
 	sequences.mu.Lock()
 	defer sequences.mu.Unlock()

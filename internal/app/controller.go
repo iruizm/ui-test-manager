@@ -18,24 +18,21 @@ func SaveSequence(c *gin.Context) {
 	var json model.Sequence
 	err := c.ShouldBindJSON(&json)
 	if err != nil {
-		id := c.Param("name")
-		if id == "" {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		}
-		json = *model.NewSequence(id)
-
+		name := c.Param("name")
+		content := c.Param("content")
+		json = *model.NewSequence(name, content)
 	}
 	persistence.SaveSequence(&json)
 	c.JSON(http.StatusOK, json.Id.String())
 }
 
-func RemoveSequence(c *gin.Context) {
+func DeleteSequence(c *gin.Context) {
 
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	persistence.RemoveSequence(&id)
+	persistence.DeleteSequence(&id)
 	c.JSON(http.StatusOK, id.String())
 }
