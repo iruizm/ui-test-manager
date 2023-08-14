@@ -10,11 +10,11 @@
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="(element, index) in store" :key="index">
+                <tr v-for="(element, index) in store.sequences" :key="index">
                     <td>{{ element.name }}</td>
                     <td>{{ element.premises }}</td>
                     <td>
-                        <button @click="removeElement(index)">Remove</button>
+                        <button @click="removeElement(element.id)">Remove</button>
                     </td>
                 </tr>
             </tbody>
@@ -24,65 +24,45 @@
     </div>
 </template>
 
-<script>
-import { inject, onMounted } from 'vue';
+<script setup>
+import { ref, inject } from 'vue';
 import { store } from '../data/store.js'
 
-export default {
-    name: 'FileTable',
-    setup() {
-        const eventBus = inject('$eventBus');
-        onMounted(() => {
-            eventBus.on("dataLoaded", isOpen => {
-                this.isOpen = isOpen;
-            })
-        })
-        return {
-            store
-        }
-    },
-    methods: {
-        async loadAll() {
-            //this.eventBus.emit("toggle-sidebar", this.sidebarOpen);
-            this.eventBus.emit("get-sequences")
-        },
-        async addElements(event) {
-            for (var i = 0; i < event.target.files.length; i++) {
-                const file = event.target.files[i]
-                const fileContent = await this.readFile(file);
-                store.push({
-                    fileName: file.name,
-                    name: file.name.split(".")[0],
-                    id: null,
-                    value: fileContent,
-                    premises: []
-                });
-            }
-        },
-        removeElement(index) {
-            this.store.splice(index, 1);
-        },
-        openFileManager() {
-            this.$refs.fileInput.click();
-        },
-        async readFile(file) {
-            return await new Promise((resolve, reject) => {
-                const reader = new FileReader();
+const eventBus = inject('$eventBus');
+const fileInput = ref(null);
 
-                reader.onload = (event) => {
-                    const content = event.target.result;
-                    resolve(content);
-                };
-
-                reader.onerror = (event) => {
-                    reject(event.target.error);
-                };
-
-                reader.readAsText(file);
-            });
-        }
+async function addElements(event) {
+    for (const file of event.target.files) {
+        const fileContent = await readFile(file);
+        const sequence = {
+            name: file.name.split(".")[0],
+            content: fileContent
+        };
+        eventBus.emit("save-sequence", sequence);
     }
-};
+}
+function removeElement(id) {
+    eventBus.emit("delete-sequence", id)
+}
+function openFileManager() {
+    fileInput.value.click();
+}
+async function readFile(file) {
+    return await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+
+        reader.onload = (event) => {
+            const content = event.target.result;
+            resolve(content);
+        };
+
+        reader.onerror = (event) => {
+            reject(event.target.error);
+        };
+
+        reader.readAsText(file);
+    });
+}
 </script>
 
 <style scoped>
@@ -111,7 +91,7 @@ td {
     color: #ffffff;
 }
 
-zº button {
+button {
     background-color: #2d2d2d;
     color: #ffffff;
     border: none;

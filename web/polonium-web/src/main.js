@@ -1,11 +1,6 @@
 import './assets/main.css'
+import { createApp } from 'vue';
+import App from './App.vue'; 
 
-import { createApp } from 'vue'
-import App from './App.vue'
-import mitt from 'mitt';
-
-const app = createApp(App)
-const eventBus = mitt();
-app.provide('$eventBus', eventBus);
-
-app.mount('#app')
+const app = createApp(App);
+app.mount('#app');
