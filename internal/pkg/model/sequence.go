@@ -3,10 +3,10 @@ package model
 import "github.com/google/uuid"
 
 type Sequence struct {
-	Name       string
-	Id         uuid.UUID
-	Content    string
-	Precedents []*Sequence
+	Name       string      `json:"name"`
+	Id         uuid.UUID   `json:"id"`
+	Content    string      `json:"content"`
+	Precedents []*Sequence `json:"precedents"`
 }
 
 func NewSequence(name string, content string) *Sequence {
@@ -18,5 +18,4 @@ func NewSequence(name string, content string) *Sequence {
 	a.Precedents = []*Sequence{}
 
 	return &a
-
 }

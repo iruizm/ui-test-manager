@@ -1,6 +1,7 @@
 {
-    "sequences_path": "../../data/sequences.json",
-    "logging_path": "../../data/api.log",
+    "data_path": "data",
+    "sequences_path": "sequences.json",
+    "logging_path": "api.log",
     "back_port": "8080",
     "front_port": "5173"
 }

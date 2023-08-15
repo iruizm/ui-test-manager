@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"path/filepath"
 	"polonium/internal/pkg/configuration"
 	"polonium/internal/pkg/model"
 	"sync"
@@ -44,7 +45,7 @@ func DeleteSequence(id *uuid.UUID) {
 
 func getSequenceMap() *SequenceMap {
 	if sequenceMap == nil {
-		file, errRead := os.ReadFile(configuration.Config.SequencesPath)
+		file, errRead := os.ReadFile(filepath.Join(configuration.Config.DataPath, configuration.Config.SequencesPath))
 		if errRead != nil {
 			if os.IsNotExist(errRead) {
 				sequenceMap = &SequenceMap{
@@ -58,7 +59,7 @@ func getSequenceMap() *SequenceMap {
 					return nil
 				}
 
-				if errWrite := os.WriteFile("sequences.json", jsonData, 0644); errWrite != nil {
+				if errWrite := os.WriteFile(filepath.Join(configuration.Config.DataPath, configuration.Config.SequencesPath), jsonData, 0644); errWrite != nil {
 					fmt.Println("Error writing initial data to file:", errWrite)
 					return nil
 				}
@@ -86,7 +87,7 @@ func (s *SequenceMap) saveMap() {
 		return
 	}
 
-	if errWrite := os.WriteFile(configuration.Config.SequencesPath, jsonData, 0644); errWrite != nil {
+	if errWrite := os.WriteFile(filepath.Join(configuration.Config.DataPath, configuration.Config.SequencesPath), jsonData, 0644); errWrite != nil {
 		fmt.Println("Error writing initial data to file:", errWrite)
 		return
 	}
