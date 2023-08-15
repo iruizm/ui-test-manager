@@ -10,7 +10,7 @@ import { Network } from 'vis-network';
 import { DataSet } from 'vis-data';
 import { store } from '../data/store.js'
 
-const eventBus = inject('$eventBus');
+const eventBus = inject('eventBus');
 const container = ref(null);
 let network = null;
 

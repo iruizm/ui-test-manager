@@ -1,24 +1,26 @@
 <script setup>
 import FileTable from '@/components/FileTable.vue'
 import SequenceGraph from '@/components/SequenceGraph.vue'
-import Client from '@/components/Client.vue'
-import { provide } from 'vue';
+import Client from '@/services/Client.vue'
+import { provide, onMounted } from 'vue';
 import mitt from 'mitt';
+
+const eventBus = mitt();
+provide('eventBus', eventBus);
+
+onMounted(() => eventBus.emit("get-sequences"))
 
 const components = {
   SequenceGraph, FileTable, Client
 }
 
-const eventBus = mitt();
-provide('$eventBus', eventBus);
-
 </script> 
 
 <template>
+  <Client />
   <header>
   </header>
   <main>
-    <Client />
     <div class="wrapper">
       <FileTable />
     </div>

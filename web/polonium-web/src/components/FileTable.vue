@@ -5,6 +5,7 @@
             <thead>
                 <tr>
                     <th>Name</th>
+                    <th>Content</th>
                     <th>Premises</th>
                     <th>Action</th>
                 </tr>
@@ -12,7 +13,13 @@
             <tbody>
                 <tr v-for="(element, index) in store.sequences" :key="index">
                     <td>{{ element.name }}</td>
+                    <td>
+                        <div v-popover="`popover-${element.content}`" @mouseover="showPopover(element.id)"
+                            @mouseleave="hidePopover(element.id)"><button></button>
+                        </div>
+                    </td>
                     <td>{{ element.premises }}</td>
+
                     <td>
                         <button @click="removeElement(element.id)">Remove</button>
                     </td>
@@ -22,14 +29,19 @@
         <button @click="openFileManager">Add Files...</button>
         <input type="file" ref="fileInput" style="display: none" @change="addElements" multiple />
     </div>
+    <div v-for="item in store.sequences" :key="item.id" :id="`popover-${item.id}`" class="popover"
+        v-show="activePopover === item.id">
+        {{ item.popoverContent }}
+    </div>
 </template>
 
 <script setup>
-import { ref, inject } from 'vue';
+import { ref, inject } from 'vue'
 import { store } from '../data/store.js'
+import { createPopper } from '@popperjs/core';
 
-const eventBus = inject('$eventBus');
-const fileInput = ref(null);
+const eventBus = inject('eventBus')
+const fileInput = ref(null)
 
 async function addElements(event) {
     for (const file of event.target.files) {
@@ -38,11 +50,14 @@ async function addElements(event) {
             name: file.name.split(".")[0],
             content: fileContent
         };
+        console.log(sequence)
         eventBus.emit("save-sequence", sequence);
     }
+    eventBus.emit("get-sequences")
 }
 function removeElement(id) {
     eventBus.emit("delete-sequence", id)
+    eventBus.emit("get-sequences")
 }
 function openFileManager() {
     fileInput.value.click();
@@ -63,6 +78,15 @@ async function readFile(file) {
         reader.readAsText(file);
     });
 }
+let activePopover = null;
+
+const showPopover = (id) => {
+    activePopover = id;
+};
+
+const hidePopover = (id) => {
+    activePopover = null;
+};
 </script>
 
 <style scoped>

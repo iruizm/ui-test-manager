@@ -3,13 +3,7 @@ import axios from 'axios';
 import { inject, ref, onMounted } from 'vue';
 import { store } from '../data/store.js'
 
-const apiClient = ref(null);
-const eventBus = inject('$eventBus')
-
-onMounted(() => {
-  getSequences()
-});
-
+const eventBus = inject('eventBus')
 eventBus.on("get-sequences", getSequences);
 eventBus.on("save-sequence", saveSequence)
 eventBus.on("delete-sequence", deleteSequence)
@@ -17,23 +11,23 @@ eventBus.on("delete-sequence", deleteSequence)
 async function getSequences() {
   try {
     const res = await axios.get('http://localhost:8080/api/sequences');
+    console.log(res)
     store.sequences = res.data
   } catch (error) {
     console.error('Error fetching data:', error);
   }
 }
-async function saveSequence(json) {
+async function saveSequence(data) {
   try {
-    const res = await axios.post('http://localhost:8080/api/sequences/add', json);
-    await getSequences()
+    const res = await axios.post('http://localhost:8080/api/sequences', data);
+    console.log(res)
   } catch (error) {
     console.error('Error fetching data:', error);
   }
 }
 async function deleteSequence(id) {
   try {
-    const res = await axios.delete('http://localhost:8080/api/sequences/remove', json);
-    await getSequences()
+    const res = await axios.delete(`http://localhost:8080/api/sequences/${id}`);
   } catch (error) {
     console.error('Error fetching data:', error);
   }

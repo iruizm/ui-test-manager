@@ -8,6 +8,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@popperjs/core": "^2.11.8",
     "axios": "^1.4.0",
     "mitt": "^3.0.1",
     "vis-network": "^9.1.6",
