@@ -31,7 +31,6 @@ func SaveSequence(sequence *model.Sequence) {
 	defer sequences.mu.Unlock()
 	sequences.MapData[sequence.Id] = sequence
 	sequences.saveMap()
-
 }
 
 func DeleteSequence(id *uuid.UUID) {

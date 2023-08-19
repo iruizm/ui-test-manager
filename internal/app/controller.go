@@ -1,7 +1,6 @@
 package api
 
 import (
-	"fmt"
 	"net/http"
 	"polonium/internal/pkg/model"
 	"polonium/internal/pkg/persistence"
@@ -11,7 +10,6 @@ import (
 )
 
 func GetSequences(c *gin.Context) {
-	gin.Logger()
 	sequences := persistence.GetSequences()
 	c.JSON(http.StatusOK, *sequences)
 }
@@ -20,10 +18,13 @@ func SaveSequence(c *gin.Context) {
 	var json model.Sequence
 	err := c.ShouldBindJSON(&json)
 	if err != nil {
-		name := c.Param("name")
-		content := c.Param("content")
-		json = *model.NewSequence(name, content)
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid sequence"})
+		return
 	}
+	if id := c.Param("id"); id == "" {
+		json = *model.NewSequence(json.Name, json.Content)
+	}
+
 	persistence.SaveSequence(&json)
 	c.JSON(http.StatusOK, json.Id.String())
 }
@@ -31,7 +32,6 @@ func SaveSequence(c *gin.Context) {
 func DeleteSequence(c *gin.Context) {
 
 	id := c.Param("id")
-	fmt.Println(id)
 	if id == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Missing sequence ID"})
 		return

@@ -11,7 +11,6 @@ eventBus.on("delete-sequence", deleteSequence)
 async function getSequences() {
   try {
     const res = await axios.get('http://localhost:8080/api/sequences');
-    console.log(res)
     store.sequences = res.data
   } catch (error) {
     console.error('Error fetching data:', error);
@@ -20,7 +19,7 @@ async function getSequences() {
 async function saveSequence(data) {
   try {
     const res = await axios.post('http://localhost:8080/api/sequences', data);
-    console.log(res)
+    await getSequences()
   } catch (error) {
     console.error('Error fetching data:', error);
   }
@@ -28,6 +27,7 @@ async function saveSequence(data) {
 async function deleteSequence(id) {
   try {
     const res = await axios.delete(`http://localhost:8080/api/sequences/${id}`);
+    await getSequences()
   } catch (error) {
     console.error('Error fetching data:', error);
   }

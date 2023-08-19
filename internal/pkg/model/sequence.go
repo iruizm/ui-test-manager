@@ -1,6 +1,8 @@
 package model
 
-import "github.com/google/uuid"
+import (
+	"github.com/google/uuid"
+)
 
 type Sequence struct {
 	Name       string      `json:"name"`
@@ -13,6 +15,7 @@ func NewSequence(name string, content string) *Sequence {
 	var a Sequence
 
 	a.Id = uuid.New()
+	println("New ID:" + a.Id.String())
 	a.Name = name
 	a.Content = content
 	a.Precedents = []*Sequence{}

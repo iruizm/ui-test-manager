@@ -53,11 +53,9 @@ async function addElements(event) {
         console.log(sequence)
         eventBus.emit("save-sequence", sequence);
     }
-    eventBus.emit("get-sequences")
 }
 function removeElement(id) {
     eventBus.emit("delete-sequence", id)
-    eventBus.emit("get-sequences")
 }
 function openFileManager() {
     fileInput.value.click();
