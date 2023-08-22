@@ -6,7 +6,7 @@
                 <tr>
                     <th>Name</th>
                     <th>Content</th>
-                    <th>Premises</th>
+                    <th>Precedents</th>
                     <th>Action</th>
                 </tr>
             </thead>
@@ -18,7 +18,10 @@
                             @mouseleave="hidePopover(element.id)"><button></button>
                         </div>
                     </td>
-                    <td>{{ element.premises }}</td>
+                    <td>
+                        <span v-if="hasPrecedents(element)">{{ element.precedents.map(item =>
+                            store.sequences[item].name) }}</span>
+                    </td>
 
                     <td>
                         <button @click="removeElement(element.id)">Remove</button>
@@ -75,6 +78,13 @@ async function readFile(file) {
 
         reader.readAsText(file);
     });
+}
+
+function hasPrecedents(element) {
+    return (
+        element?.precedents?.length !== undefined &&
+        element.precedents.length > 0
+    );
 }
 let activePopover = null;
 

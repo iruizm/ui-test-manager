@@ -18,6 +18,7 @@ async function getSequences() {
 }
 async function saveSequence(data) {
   try {
+    console.log(data)
     const res = await axios.post('http://localhost:8080/api/sequences', data);
     await getSequences()
   } catch (error) {
