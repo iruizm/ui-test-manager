@@ -48,3 +48,8 @@ Order Screen can be viewed as nodes or as json with pre-condition field.
 
 ### FEATURES
 Add button to view content of file (See vue)
+
+
+### PENDING
+
+Solve issue of SaveSequence ShouldBindJson creating id = 00000000000000000 for new arrivals.

@@ -18,10 +18,11 @@ func SaveSequence(c *gin.Context) {
 	var json model.Sequence
 	err := c.ShouldBindJSON(&json)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid sequence"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	if id := c.Param("id"); id == "" {
+	zero := uuid.UUID{}
+	if json.Id.String() == zero.String() {
 		json = *model.NewSequence(json.Name, json.Content)
 	}
 
