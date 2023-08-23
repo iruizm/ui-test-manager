@@ -13,13 +13,13 @@ import (
 )
 
 type SequenceMap struct {
-	MapData map[uuid.UUID]interface{} `json:"map_data"`
+	MapData map[uuid.UUID]model.Sequence `json:"map_data"`
 	mu      sync.Mutex
 }
 
 var sequenceMap *SequenceMap
 
-func GetSequences() *map[uuid.UUID]interface{} {
+func GetSequences() *map[uuid.UUID]model.Sequence {
 	sequences := getSequenceMap()
 	return &sequences.MapData
 
@@ -29,7 +29,7 @@ func SaveSequence(sequence *model.Sequence) {
 	sequences := getSequenceMap()
 	sequences.mu.Lock()
 	defer sequences.mu.Unlock()
-	sequences.MapData[sequence.Id] = sequence
+	sequences.MapData[sequence.Id] = *sequence
 	sequences.saveMap()
 }
 
@@ -38,6 +38,16 @@ func DeleteSequence(id *uuid.UUID) {
 	sequences.mu.Lock()
 	defer sequences.mu.Unlock()
 
+	for key, sequence := range sequences.MapData {
+		updatedPrecedents := make([]uuid.UUID, 0)
+		for _, precID := range sequence.Precedents {
+			if precID != *id {
+				updatedPrecedents = append(updatedPrecedents, precID)
+			}
+		}
+		sequence.Precedents = updatedPrecedents
+		sequences.MapData[key] = sequence
+	}
 	delete(sequences.MapData, *id)
 	sequences.saveMap()
 }
@@ -48,7 +58,7 @@ func getSequenceMap() *SequenceMap {
 		if errRead != nil {
 			if os.IsNotExist(errRead) {
 				sequenceMap = &SequenceMap{
-					MapData: make(map[uuid.UUID]interface{}),
+					MapData: make(map[uuid.UUID]model.Sequence),
 					mu:      sync.Mutex{},
 				}
 
@@ -85,7 +95,6 @@ func (s *SequenceMap) saveMap() {
 		fmt.Println("Error marshaling initial data:", errMarshal)
 		return
 	}
-
 	if errWrite := os.WriteFile(filepath.Join(configuration.Config.DataPath, configuration.Config.SequencesPath), jsonData, 0644); errWrite != nil {
 		fmt.Println("Error writing initial data to file:", errWrite)
 		return

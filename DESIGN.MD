@@ -52,4 +52,4 @@ Add button to view content of file (See vue)
 
 ### PENDING
 
-Solve issue of SaveSequence ShouldBindJson creating id = 00000000000000000 for new arrivals.
+DELETE ID FROM PRECEDENT ARRAYS WHEN DELETING AN ELEMENT
