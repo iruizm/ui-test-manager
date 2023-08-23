@@ -16,20 +16,10 @@ let network = null;
 let selectedNode = null
 
 onMounted(() => {
-  // Define nodes and edges
-  const nodes = new DataSet([
-    { id: 1, label: 'Node 1' },
-    { id: 2, label: 'Node 2' },
-    { id: 3, label: 'Node 3' },
-  ]);
+  const nodes = new DataSet([]);
 
-  const edges = new DataSet([
-    { from: 1, to: 2 },
-    { from: 2, to: 3 },
-    { from: 3, to: 1 },
-  ]);
+  const edges = new DataSet([]);
 
-  // Set up options for the network
   const options = {
     nodes: {
       shape: 'square',
@@ -39,10 +29,17 @@ onMounted(() => {
         size: 14,
         color: '#white',
       },
+    },
+    edges: {
+      arrows: {
+        to: {
+          enabled: true,
+          scaleFactor: 0.5 
+        }
+      }
     }
   };
 
-  // Create the network
   const data = {
     nodes: nodes,
     edges: edges,
@@ -52,18 +49,18 @@ onMounted(() => {
   watch(() => store.sequences, () => {
     data.nodes = new DataSet(Object.keys(store.sequences).map((key) => ({ id: store.sequences[key].id, label: store.sequences[key].name })));
     data.edges = new DataSet(Object.keys(store.sequences).flatMap((key) =>
-      store.sequences[key].precedents.map((precedent) => ({ from: precedent, to: store.sequences[key].id }))
+      store.sequences[key].precedents.map((precedent) => ({ from: precedent, to: store.sequences[key].id}))
     ))
-    network.setData(data) 
+    network.setData(data)
   });
 
   network.on('click', (params) => {
     if (params.nodes.length === 1) {
       let clickedNode = params.nodes[0];
       if (selectedNode) {
-        var sequence = store.sequences[selectedNode]
+        var sequence = store.sequences[clickedNode]
         if (!sequence.precedents.includes(selectedNode)) {
-          sequence.precedents.push(clickedNode)
+          sequence.precedents.push(selectedNode)
           eventBus.emit("save-sequence", toRaw(sequence));
         }
         selectedNode = null

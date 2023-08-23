@@ -53,9 +53,9 @@ async function addElements(event) {
             name: file.name.split(".")[0],
             content: fileContent
         };
-        console.log(sequence)
         eventBus.emit("save-sequence", sequence);
     }
+    event.target.value = ''
 }
 function removeElement(id) {
     eventBus.emit("delete-sequence", id)
