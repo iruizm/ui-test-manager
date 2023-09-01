@@ -7,6 +7,7 @@ const eventBus = inject('eventBus')
 eventBus.on("get-sequences", getSequences);
 eventBus.on("save-sequence", saveSequence)
 eventBus.on("delete-sequence", deleteSequence)
+eventBus.on("delete-precedent", deletePrecedent)
 
 async function getSequences() {
   try {
@@ -18,7 +19,6 @@ async function getSequences() {
 }
 async function saveSequence(data) {
   try {
-    console.log(data)
     const res = await axios.post('http://localhost:8080/api/sequences', data);
     await getSequences()
   } catch (error) {
@@ -28,6 +28,15 @@ async function saveSequence(data) {
 async function deleteSequence(id) {
   try {
     const res = await axios.delete(`http://localhost:8080/api/sequences/${id}`);
+    await getSequences()
+  } catch (error) {
+    console.error('Error fetching data:', error);
+  }
+}
+
+async function deletePrecedent(e) {
+  try {
+    const res = await axios.delete(`http://localhost:8080/api/sequences/${e.idSequence}/${e.idPrecedent}`);
     await getSequences()
   } catch (error) {
     console.error('Error fetching data:', error);

@@ -18,16 +18,30 @@ const components = {
 
 <template>
   <Client />
-  <header>
-  </header>
-  <main>
-    <div class="wrapper">
+
+  <div class="dashboard">
+    <div class="table">
       <FileTable />
     </div>
-    <div class="wrapper">
+    <div class="graph">
       <SequenceGraph />
     </div>
-  </main>
+  </div>
 </template>
 
-<style scoped></style>
+<style>
+.dashboard {
+  display: flex;
+  height: 100vh;
+  width: 80vw;
+}
+
+.table,
+.graph {
+  flex: 1;
+  padding: 1rem;
+  box-sizing: border-box;
+  overflow: auto;
+  /* Add scrolling if content overflows */
+}
+</style>

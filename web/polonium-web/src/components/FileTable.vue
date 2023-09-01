@@ -5,46 +5,56 @@
             <thead>
                 <tr>
                     <th>Name</th>
-                    <th>Content</th>
                     <th>Precedents</th>
+                    <th>Content</th>
                     <th>Action</th>
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="(element, index) in store.sequences" :key="index">
-                    <td>{{ element.name }}</td>
+                <tr v-for="(sequence, index) in store.sequences" :key="index">
+                    <td>{{ sequence.name }}</td>
                     <td>
-                        <div v-popover="`popover-${element.content}`" @mouseover="showPopover(element.id)"
-                            @mouseleave="hidePopover(element.id)"><button></button>
-                        </div>
+                        <span v-if="hasPrecedents(sequence)">
+                            <span class="sequence-item" v-for="item in sequence.precedents" :key="item">
+                                <span class="sequence-item span">{{ store.sequences[item].name }}</span>
+                                <button @click="removePrecedent(sequence.id, item)"
+                                    class="delete-precedent;sequence-item button">&times;</button>
+                            </span>
+                        </span>
                     </td>
                     <td>
-                        <span v-if="hasPrecedents(element)">{{ element.precedents.map(item =>
-                            store.sequences[item].name) }}</span>
+                        <button @click="openModal(index)">Open Modal</button>
                     </td>
-
                     <td>
-                        <button @click="removeElement(element.id)">Remove</button>
+                        <button @click="removeElement(sequence.id)">Remove</button>
                     </td>
                 </tr>
+                <ContentModal v-if="selectedSequence !== null" :sequence="store.sequences[selectedSequence].content"
+                    @string-updated="updateString" @modal-closed="closeModal" />
             </tbody>
         </table>
         <button @click="openFileManager">Add Files...</button>
         <input type="file" ref="fileInput" style="display: none" @change="addElements" multiple />
-    </div>
-    <div v-for="item in store.sequences" :key="item.id" :id="`popover-${item.id}`" class="popover"
-        v-show="activePopover === item.id">
-        {{ item.popoverContent }}
     </div>
 </template>
 
 <script setup>
 import { ref, inject } from 'vue'
 import { store } from '../data/store.js'
-import { createPopper } from '@popperjs/core';
+import ContentModal from "@/components/ContentModal.vue"
 
 const eventBus = inject('eventBus')
 const fileInput = ref(null)
+
+let selectedSequence = ref(null);
+
+function openModal(index) {
+    selectedSequence.value = index;
+}
+
+function closeModal() {
+    selectedSequence.value = null;
+}
 
 async function addElements(event) {
     for (const file of event.target.files) {
@@ -60,6 +70,14 @@ async function addElements(event) {
 function removeElement(id) {
     eventBus.emit("delete-sequence", id)
 }
+function removePrecedent(idSequence, idPrecedent) {
+    var e = {
+        idSequence: idSequence,
+        idPrecedent: idPrecedent
+    }
+    eventBus.emit("delete-precedent", e)
+}
+
 function openFileManager() {
     fileInput.value.click();
 }
@@ -86,15 +104,11 @@ function hasPrecedents(element) {
         element.precedents.length > 0
     );
 }
-let activePopover = null;
 
-const showPopover = (id) => {
-    activePopover = id;
+function updateString({ item, newString }) {
+    item.content = newString;
 };
 
-const hidePopover = (id) => {
-    activePopover = null;
-};
 </script>
 
 <style scoped>
@@ -134,5 +148,35 @@ button {
 
 button:hover {
     background-color: #4d4d4d;
+}
+
+.sequence-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.sequence-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    background-color: #2d2d2d;
+    color: #fff;
+    border-radius: 5px;
+    padding: 10px;
+}
+
+.sequence-item button {
+    background-color: #e74c3c;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    padding: 5px 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out;
+}
+
+.sequence-item button:hover {
+    background-color: #c0392b;
 }
 </style>
