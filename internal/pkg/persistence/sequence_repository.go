@@ -2,7 +2,6 @@ package persistence
 
 import (
 	"encoding/json"
-	"fmt"
 	"os"
 	"path/filepath"
 	"polonium/internal/pkg/configuration"
@@ -19,22 +18,34 @@ type SequenceMap struct {
 
 var sequenceMap *SequenceMap
 
-func GetSequences() *map[uuid.UUID]model.Sequence {
-	sequences := getSequenceMap()
-	return &sequences.MapData
-
+func GetSequences() (*map[uuid.UUID]model.Sequence, error) {
+	sequences, err := getSequenceMap()
+	if err != nil {
+		return nil, err
+	}
+	return &sequences.MapData, nil
 }
 
-func SaveSequence(sequence *model.Sequence) {
-	sequences := getSequenceMap()
+func SaveSequence(sequence *model.Sequence) error {
+	sequences, err := getSequenceMap()
+	if err != nil {
+		return err
+	}
 	sequences.mu.Lock()
 	defer sequences.mu.Unlock()
 	sequences.MapData[sequence.Id] = *sequence
-	sequences.saveMap()
+	err = sequences.saveMap()
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-func DeleteSequence(id *uuid.UUID) {
-	sequences := getSequenceMap()
+func DeleteSequence(id *uuid.UUID) error {
+	sequences, err := getSequenceMap()
+	if err != nil {
+		return err
+	}
 	sequences.mu.Lock()
 	defer sequences.mu.Unlock()
 
@@ -49,10 +60,38 @@ func DeleteSequence(id *uuid.UUID) {
 		sequences.MapData[key] = sequence
 	}
 	delete(sequences.MapData, *id)
-	sequences.saveMap()
+	err = sequences.saveMap()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+func DeletePrecedent(idSequence *uuid.UUID, idPrecedent *uuid.UUID) error {
+	sequences, err := getSequenceMap()
+	if err != nil {
+		return err
+	}
+	sequences.mu.Lock()
+	defer sequences.mu.Unlock()
+
+	sequence := sequences.MapData[*idSequence]
+	updatedPrecedents := make([]uuid.UUID, 0)
+	for _, precID := range sequence.Precedents {
+		if precID != *idPrecedent {
+			updatedPrecedents = append(updatedPrecedents, precID)
+		}
+	}
+	sequence.Precedents = updatedPrecedents
+	sequences.MapData[*idSequence] = sequence
+
+	err = sequences.saveMap()
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-func getSequenceMap() *SequenceMap {
+func getSequenceMap() (*SequenceMap, error) {
 	if sequenceMap == nil {
 		file, errRead := os.ReadFile(filepath.Join(configuration.Config.DataPath, configuration.Config.SequencesPath))
 		if errRead != nil {
@@ -64,39 +103,34 @@ func getSequenceMap() *SequenceMap {
 
 				jsonData, errMarshal := json.Marshal(sequenceMap)
 				if errMarshal != nil {
-					fmt.Println("Error marshaling initial data:", errMarshal)
-					return nil
+					return nil, errMarshal
 				}
 
 				if errWrite := os.WriteFile(filepath.Join(configuration.Config.DataPath, configuration.Config.SequencesPath), jsonData, 0644); errWrite != nil {
-					fmt.Println("Error writing initial data to file:", errWrite)
-					return nil
+					return nil, errWrite
 				}
 
 			} else {
-				fmt.Println("Error reading sequence file:", errRead)
-				return nil
+				return nil, errRead
 			}
 		} else {
 			if err := json.Unmarshal(file, &sequenceMap); err != nil {
-				fmt.Println("Error parsing sequence file:", err)
-				return nil
+				return nil, err
 			}
 		}
 
 	}
-	return sequenceMap
+	return sequenceMap, nil
 }
 
-func (s *SequenceMap) saveMap() {
+func (s *SequenceMap) saveMap() error {
 
 	jsonData, errMarshal := json.MarshalIndent(&s, "", "  ")
 	if errMarshal != nil {
-		fmt.Println("Error marshaling initial data:", errMarshal)
-		return
+		return errMarshal
 	}
 	if errWrite := os.WriteFile(filepath.Join(configuration.Config.DataPath, configuration.Config.SequencesPath), jsonData, 0644); errWrite != nil {
-		fmt.Println("Error writing initial data to file:", errWrite)
-		return
+		return errWrite
 	}
+	return nil
 }

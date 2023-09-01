@@ -10,7 +10,10 @@ import (
 )
 
 func GetSequences(c *gin.Context) {
-	sequences := persistence.GetSequences()
+	sequences, err := persistence.GetSequences()
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	}
 	c.JSON(http.StatusOK, *sequences)
 }
 
@@ -48,4 +51,31 @@ func DeleteSequence(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, uuid.String())
+}
+
+func DeletePrecedent(c *gin.Context) {
+
+	idSequence, idPrecedent := c.Param("id"), c.Param("idPrecedent")
+
+	if idSequence == "" || idPrecedent == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Missing ID"})
+		return
+	}
+	uuidSequence, err := uuid.Parse(idSequence)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid sequence ID"})
+		return
+	}
+	uuidPrecedent, err := uuid.Parse(idPrecedent)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid precedent ID"})
+		return
+	}
+
+	err = persistence.DeletePrecedent(&uuidSequence, &uuidPrecedent)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete precedent"})
+		return
+	}
+	c.JSON(http.StatusOK, uuidSequence.String()+"|"+uuidPrecedent.String())
 }

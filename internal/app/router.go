@@ -41,6 +41,7 @@ func Setup() *gin.Engine {
 	app.GET("/api/sequences", GetSequences)
 	app.POST("/api/sequences", SaveSequence)
 	app.DELETE("/api/sequences/:id", DeleteSequence)
+	app.DELETE("/api/sequences/:id/:idPrecedent", DeletePrecedent)
 
 	// ================== Docs Routes
 	app.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
