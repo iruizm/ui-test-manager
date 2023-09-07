@@ -16,9 +16,10 @@
                     <td>
                         <span v-if="hasPrecedents(sequence)">
                             <span class="sequence-item" v-for="item in sequence.precedents" :key="item">
-                                <span class="sequence-item span">{{ store.sequences[item].name }}</span>
-                                <button @click="removePrecedent(sequence.id, item)"
-                                    class="delete-precedent;sequence-item button">&times;</button>
+                                <span class="sequence-item span">{{ store.sequences[item].name }}
+                                    <button @click="removePrecedent(sequence.id, item)"
+                                        class="delete-precedent;sequence-item button">&times;</button>
+                                </span>
                             </span>
                         </span>
                     </td>
@@ -128,7 +129,7 @@ thead th {
 }
 
 tbody tr:nth-child(even) {
-    background-color: #3a3a3a;
+    background-color: #252525;
 }
 
 td {
@@ -153,25 +154,26 @@ button:hover {
 .sequence-item {
     display: flex;
     align-items: center;
-    margin-bottom: 10px;
+    margin-bottom: 2px;
 }
 
-.sequence-item {
+.sequence-item span {
     display: flex;
     align-items: center;
-    margin-bottom: 10px;
+    margin-bottom: 3px;
     background-color: #2d2d2d;
     color: #fff;
-    border-radius: 5px;
-    padding: 10px;
+    border-radius: 1px;
+    padding: 2px;
 }
 
 .sequence-item button {
-    background-color: #e74c3c;
+    background-color: #616161;
     color: #fff;
-    border: none;
+    border: 1px;
     border-radius: 50%;
-    padding: 5px 8px;
+    margin-left: 3px;
+    padding: 2px 3px;
     cursor: pointer;
     transition: background-color 0.3s ease-in-out;
 }

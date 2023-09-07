@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div ref="container" style="width: 800px; height: 600px;"></div>
+    <div ref="container" style="height: 600px;border: 2px solid #333333"></div>
   </div>
 </template>
 
@@ -22,19 +22,27 @@ onMounted(() => {
 
   const options = {
     nodes: {
-      shape: 'square',
+      shape: 'dot',
       size: 25,
-      color: 'white',
+      color: {
+        background: '#2d2d2d',
+        border: 'grey',
+        highlight: {
+          background: '#2d2d2d',
+          border: 'white',
+        }
+      },
       font: {
         size: 14,
         color: '#white',
       },
     },
     edges: {
+      color: 'white',
       arrows: {
         to: {
           enabled: true,
-          scaleFactor: 0.5 
+          scaleFactor: 0.5
         }
       }
     }
@@ -49,7 +57,7 @@ onMounted(() => {
   watch(() => store.sequences, () => {
     data.nodes = new DataSet(Object.keys(store.sequences).map((key) => ({ id: store.sequences[key].id, label: store.sequences[key].name })));
     data.edges = new DataSet(Object.keys(store.sequences).flatMap((key) =>
-      store.sequences[key].precedents.map((precedent) => ({ from: precedent, to: store.sequences[key].id}))
+      store.sequences[key].precedents.map((precedent) => ({ from: precedent, to: store.sequences[key].id }))
     ))
     network.setData(data)
   });
