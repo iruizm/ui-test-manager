@@ -79,3 +79,13 @@ func DeletePrecedent(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, uuidSequence.String()+"|"+uuidPrecedent.String())
 }
+
+func GetOrderedSequences(c *gin.Context) {
+
+	sequences, err := OrderSequences()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to order sequences"})
+		return
+	}
+	c.JSON(http.StatusOK, sequences)
+}

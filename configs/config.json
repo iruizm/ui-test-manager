@@ -3,5 +3,5 @@
     "sequences_path": "sequences.json",
     "logging_path": "api.log",
     "back_port": "8080",
-    "front_port": "5173"
+    "front_port": "8081"
 }

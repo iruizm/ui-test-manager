@@ -39,6 +39,7 @@ func Setup() *gin.Engine {
 	app.Use(gin.Recovery())
 
 	app.GET("/api/sequences", GetSequences)
+	app.GET("/api/order", GetOrderedSequences)
 	app.POST("/api/sequences", SaveSequence)
 	app.DELETE("/api/sequences/:id", DeleteSequence)
 	app.DELETE("/api/sequences/:id/:idPrecedent", DeletePrecedent)

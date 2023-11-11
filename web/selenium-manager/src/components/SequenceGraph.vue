@@ -1,12 +1,14 @@
 <template>
-  <div>
-    <div ref="container" style="height: 600px;border: 2px solid #333333"></div>
-  </div>
+  <v-card>
+    <v-card-text>
+      <div ref="container" style="height: 800px;border: 2px solid #333333"></div>
+    </v-card-text>
+  </v-card>
 </template>
 
 <script setup>
 import { ref, inject, onMounted, toRaw, watch } from 'vue';
-import { Network } from 'vis-network';
+import { Network } from 'vis-network/standalone';
 import { DataSet } from 'vis-data';
 import { store } from '../data/store.js'
 
@@ -34,7 +36,7 @@ onMounted(() => {
       },
       font: {
         size: 14,
-        color: '#white',
+        color: 'white',
       },
     },
     edges: {
@@ -76,14 +78,9 @@ onMounted(() => {
       } else {
         selectedNode = clickedNode;
       }
+    } else {
+      selectedNode = null
     }
   });
 });
 </script>
-
-<style scoped>
-.network-container {
-  width: 100%;
-  height: 500px;
-}
-</style>
