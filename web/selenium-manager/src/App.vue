@@ -1,7 +1,7 @@
 <template>
     <ClientAPI />
   <v-app>
-    <v-app-bar color="teal-darken-4" title="Test Manager" /> 
+    <v-app-bar color="teal-darken-3"/> 
 
     <!-- <v-navigation-drawer>
       <v-list>

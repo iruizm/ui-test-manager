@@ -1,12 +1,12 @@
 <template>
   <v-card>
-    <v-toolbar color="teal-darken-4" compact floating>
-      <v-toolbar-title>Scripts</v-toolbar-title>
+    <v-toolbar color="teal-darken-3" density="comfortable" floating>
+      <v-toolbar-title> <v-icon>mdi-playlist-check</v-icon> Scripts</v-toolbar-title>
 
       <v-spacer></v-spacer>
 
-      <v-text-field v-model="searchText" append-icon="mdi-magnify" label="Search" single-line hide-details></v-text-field>
-
+      <v-text-field v-model="searchText" prepend-icon="mdi-magnify" label="Search" single-line
+        hide-details></v-text-field>
       <v-tooltip text="Add" location="top">
         <template v-slot:activator="{ props }">
           <v-btn v-bind="props" variant="text" icon="mdi-plus-box" @click="openFileManager"></v-btn>
@@ -14,14 +14,14 @@
       </v-tooltip>
       <v-tooltip text="Generate" location="top">
         <template v-slot:activator="{ props }">
-          <v-btn v-bind="props" variant="text" icon="mdi-play-circle-outline" @click="orderSequences"></v-btn>
+          <v-btn v-bind="props" variant="text" icon="mdi-play-circle-outline" @click="openGenerateDialog"></v-btn>
         </template>
       </v-tooltip>
     </v-toolbar>
 
     <v-card-text>
-      <v-list height="662px" class="ma-2" color="indigo-darken-3">
-        <v-list-item v-for="sequence in paginatedData" :key="sequence.id" :style="{ height: '63px' }" color="primary"
+      <v-list elevation="4" height="670px" class="ma-2" color="indigo-darken-3">
+        <v-list-item elevation="1" v-for="sequence in paginatedData" :key="sequence.id" :style="{ height: '65px' }"
           variant="plain">
           <template v-slot:prepend>
             {{ sequence.name }}
@@ -37,21 +37,67 @@
           </v-container>
           <template v-slot:append>
             <v-btn-group>
-              <v-btn class="ma-1" icon="mdi-eye"></v-btn>
+              <v-btn class="ma-1" icon="mdi-eye" @click="openContentDialog(sequence)">
+              </v-btn>
               <v-btn @click="removeElement(sequence.id)" class="ma-1" icon="mdi-delete"></v-btn>
             </v-btn-group>
           </template>
-
         </v-list-item>
       </v-list>
       <v-pagination small v-model="currentPage" :length="pageCount" @input="changePage"></v-pagination>
-
     </v-card-text>
   </v-card>
+
+  <template>
+    <v-row justify="center">
+      <v-dialog v-model="contentVisible" persistent width="1024">
+        <v-card class="fullscreen-card">
+          <v-card-title>Script</v-card-title>
+          <v-card-text>
+            <v-textarea class="full-screen-textarea" v-model="sequenceRef.content"></v-textarea>
+          </v-card-text>
+          <v-card-actions class="justify-end">
+            <v-tooltip text="Save">
+              <template v-slot:activator="{ props }">
+                <v-btn v-bind="props" class="ma-1" icon="mdi-content-save" @click="saveContentDialog"></v-btn>
+              </template>
+            </v-tooltip>
+            <v-tooltip text="Close">
+              <template v-slot:activator="{ props }">
+                <v-btn v-bind="props" class="ma-1" icon="mdi-close" @click="closeContentDialog"></v-btn>
+              </template>
+            </v-tooltip>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+    </v-row>
+  </template>
+
+  <template>
+    <v-dialog v-model="generateVisible" width="600px">
+      <v-card>
+        <v-toolbar dark color="primary">
+          <v-btn icon @click="closeGenerateDialog">
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+          <v-toolbar-title>Generator</v-toolbar-title>
+        </v-toolbar>
+        <v-card-actions class="justify-end">
+            <v-tooltip text="Generate">
+              <template v-slot:activator="{ props }">
+                <v-btn v-bind="props" class="ma-1" icon="mdi-play" @click="generateTests"></v-btn>
+              </template>
+            </v-tooltip>
+          </v-card-actions>
+      </v-card>
+    </v-dialog>
+  </template>
+
+
   <input type="file" ref="fileInput" style="display: none" @change="addElements" multiple />
 </template>
 <script setup>
-import { ref, inject, computed, watch} from 'vue'
+import { ref, inject, computed, watch } from 'vue'
 import { store } from '../data/store.js'
 
 const eventBus = inject('eventBus')
@@ -88,11 +134,15 @@ const pageCount = computed(() => {
 });
 
 watch(searchText, () => {
-  currentPage.value = 1; 
+  currentPage.value = 1;
 });
 
 function changePage(page) {
   currentPage.value = page;
+}
+ 
+async function generateTests(){
+  eventBus.emit("order-sequences")
 }
 
 async function addElements(event) {
@@ -122,10 +172,6 @@ function openFileManager() {
   fileInput.value.click();
 }
 
-function orderSequences() {
-  eventBus.emit("order-sequences")
-}
-
 async function readFile(file) {
   return await new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -148,5 +194,34 @@ function hasPrecedents(element) {
     element?.precedents?.length !== undefined &&
     element.precedents.length > 0
   );
+}
+
+const sequenceRef = ref(null);
+const generateRef = ref(null)
+const contentVisible = ref(null);
+const generateVisible = ref(null);
+
+
+function openContentDialog(content) {
+  sequenceRef.value = content;
+  contentVisible.value = true;
+}
+
+function saveContentDialog() {
+  eventBus.emit("save-sequence", sequenceRef.value)
+  contentVisible.value = false;
+}
+
+function closeContentDialog() {
+  contentVisible.value = false;
+}
+
+function openGenerateDialog(content) {
+  generateRef.value = content;
+  generateVisible.value = true;
+}
+
+function closeGenerateDialog() {
+  generateVisible.value = false;
 }
 </script>
