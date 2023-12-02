@@ -20,7 +20,7 @@
     </v-toolbar>
 
     <v-card-text>
-      <v-list elevation="4" height="670px" class="ma-2" color="indigo-darken-3">
+      <v-list elevation="4" class="ma-2" color="indigo-darken-3" style="height: 100%">
         <v-list-item elevation="1" v-for="sequence in paginatedData" :key="sequence.id" :style="{ height: '65px' }"
           variant="plain">
           <template v-slot:prepend>
@@ -108,10 +108,10 @@
       </v-card>
     </v-dialog>
   </template>
-
-
   <input type="file" ref="fileInput" style="display: none" @change="addElements" multiple />
 </template>
+
+
 <script setup>
 import { ref, inject, computed, watch } from 'vue'
 import { store } from '../data/store.js'
@@ -133,6 +133,22 @@ const tableData = computed(() => {
 const itemsPerPage = ref(10);
 const currentPage = ref(1);
 
+const windowHeight = ref(window.innerHeight);
+
+// Function to handle window resize
+const handleResize = () => {
+  windowHeight.value = window.innerHeight;
+};
+
+window.addEventListener('resize', handleResize);
+
+// Watch window width changes and adjust itemsPerPage
+watch(windowHeight, (newHeight) => {
+  itemsPerPage.value = Math.round(newHeight / 90)
+  console.log(itemsPerPage)
+});
+
+
 const filteredData = computed(() => {
   const lowerCaseSearch = searchText.value.toLowerCase();
   return tableData.value.filter(sequence =>
@@ -153,6 +169,7 @@ const pageCount = computed(() => {
 watch(searchText, () => {
   currentPage.value = 1;
 });
+
 
 function changePage(page) {
   currentPage.value = page;
@@ -247,19 +264,15 @@ function generateFiles() {
   const zip = new JSZip();
   var padding = store.ordered.length.toString().length + 1
   store.ordered.forEach((element, index) => {
-    const fileName = `test_${(index+1).toString().padStart(padding, '0')}_${element.name}.py`;
+    const fileName = `test_${(index + 1).toString().padStart(padding, '0')}_${element.name}.py`;
     const fileContent = element.content;
-
-    // Create a file in the zip folder
     zip.file(fileName, fileContent);
   });
 
-  // Generate the zip file
   zip.generateAsync({ type: 'blob' }).then(content => {
-    // Create a link element to download the zip file
     const link = document.createElement('a');
     link.href = URL.createObjectURL(content);
-    var date =  (new Date()).toISOString().replace(/[:._]/g, '-');
+    var date = (new Date()).toISOString().replace(/[:._]/g, '-');
     link.download = 'tests_' + date + '.zip';
     link.click();
   });

@@ -1,9 +1,9 @@
 <template>
-  <v-card>
-    <v-card-text>
-      <div ref="container" style="height: 800px;border: 2px solid #333333"></div>
-    </v-card-text>
-  </v-card>
+    <v-card>
+      <v-card-text>
+        <div ref="container" style="border: 2px solid #333333"></div>
+      </v-card-text>
+    </v-card>
 </template>
 
 <script setup>
@@ -17,7 +17,16 @@ const container = ref(null);
 let network = null;
 let selectedNode = null
 
+const graphResize = () => {
+  if (container.value) {
+    container.value.style.height = `${window.innerHeight - 138}px`;
+  }
+};
+
 onMounted(() => {
+
+  graphResize();
+  window.addEventListener('resize', graphResize);
   const nodes = new DataSet([]);
 
   const edges = new DataSet([]);
@@ -82,5 +91,6 @@ onMounted(() => {
       selectedNode = null
     }
   });
+
 });
 </script>
