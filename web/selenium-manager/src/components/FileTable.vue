@@ -50,7 +50,7 @@
 
   <template>
     <v-row justify="center">
-      <v-dialog v-model="contentVisible" persistent width="1024">
+      <v-dialog v-model="contentVisible" width="1024">
         <v-card class="fullscreen-card">
           <v-card-title>Script</v-card-title>
           <v-card-text>
@@ -76,19 +76,35 @@
   <template>
     <v-dialog v-model="generateVisible" width="600px">
       <v-card>
-        <v-toolbar dark color="primary">
+        <v-toolbar dark color="teal-darken-3">
           <v-btn icon @click="closeGenerateDialog">
             <v-icon>mdi-close</v-icon>
           </v-btn>
-          <v-toolbar-title>Generator</v-toolbar-title>
+          <v-toolbar-title>Sequence</v-toolbar-title>
         </v-toolbar>
-        <v-card-actions class="justify-end">
-            <v-tooltip text="Generate">
-              <template v-slot:activator="{ props }">
-                <v-btn v-bind="props" class="ma-1" icon="mdi-play" @click="generateTests"></v-btn>
+        <v-card-text>
+          <v-list elevation="4" height="670px" class="ma-2" color="indigo-darken-3">
+            <v-list-item elevation="1" v-for="test in store.ordered" :key="test.id" :style="{ height: '65px' }"
+              variant="plain">
+              <template v-slot:prepend>
+                {{ test.name }}
               </template>
-            </v-tooltip>
-          </v-card-actions>
+              <template v-slot:append>
+                <v-btn-group>
+                  <v-btn class="ma-1" icon="mdi-eye" @click="openContentDialog(test)">
+                  </v-btn>
+                </v-btn-group>
+              </template>
+            </v-list-item>
+          </v-list>
+        </v-card-text>
+        <v-card-actions class="justify-end">
+          <v-tooltip text="Save">
+            <template v-slot:activator="{ props }">
+              <v-btn v-bind="props" class="ma-1" icon="mdi-content-save" @click="generateFiles"></v-btn>
+            </template>
+          </v-tooltip>
+        </v-card-actions>
       </v-card>
     </v-dialog>
   </template>
@@ -99,6 +115,7 @@
 <script setup>
 import { ref, inject, computed, watch } from 'vue'
 import { store } from '../data/store.js'
+import JSZip from 'jszip';
 
 const eventBus = inject('eventBus')
 const fileInput = ref(null)
@@ -140,8 +157,8 @@ watch(searchText, () => {
 function changePage(page) {
   currentPage.value = page;
 }
- 
-async function generateTests(){
+
+async function generateTests() {
   eventBus.emit("order-sequences")
 }
 
@@ -217,11 +234,34 @@ function closeContentDialog() {
 }
 
 function openGenerateDialog(content) {
+  generateTests();
   generateRef.value = content;
   generateVisible.value = true;
 }
 
 function closeGenerateDialog() {
   generateVisible.value = false;
+}
+
+function generateFiles() {
+  const zip = new JSZip();
+  var padding = store.ordered.length.toString().length + 1
+  store.ordered.forEach((element, index) => {
+    const fileName = `test_${(index+1).toString().padStart(padding, '0')}_${element.name}.py`;
+    const fileContent = element.content;
+
+    // Create a file in the zip folder
+    zip.file(fileName, fileContent);
+  });
+
+  // Generate the zip file
+  zip.generateAsync({ type: 'blob' }).then(content => {
+    // Create a link element to download the zip file
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(content);
+    var date =  (new Date()).toISOString().replace(/[:._]/g, '-');
+    link.download = 'tests_' + date + '.zip';
+    link.click();
+  });
 }
 </script>
