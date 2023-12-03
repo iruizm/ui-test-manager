@@ -1,16 +1,16 @@
-package api
+package controller
 
 import (
 	"net/http"
-	"polonium/internal/pkg/model"
-	"polonium/internal/pkg/persistence"
+	service "selenium-manager/internal/app/services"
+	"selenium-manager/internal/pkg/model"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
 
 func GetSequences(c *gin.Context) {
-	sequences, err := persistence.GetSequences()
+	sequences, err := service.GetSequences()
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	}
@@ -24,13 +24,12 @@ func SaveSequence(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	zero := uuid.UUID{}
-	if json.Id.String() == zero.String() {
-		json = *model.NewSequence(json.Name, json.Content)
+	res, err := service.SaveSequence(json)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	}
-
-	persistence.SaveSequence(&json)
-	c.JSON(http.StatusOK, json.Id.String())
+	c.JSON(http.StatusOK, res)
 }
 
 func DeleteSequence(c *gin.Context) {
@@ -42,15 +41,15 @@ func DeleteSequence(c *gin.Context) {
 	}
 	uuid, err := uuid.Parse(id)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	persistence.DeleteSequence(&uuid)
+	res, err := service.DeleteSequence(uuid)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete sequence"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, uuid.String())
+	c.JSON(http.StatusOK, res)
 }
 
 func DeletePrecedent(c *gin.Context) {
@@ -63,28 +62,28 @@ func DeletePrecedent(c *gin.Context) {
 	}
 	uuidSequence, err := uuid.Parse(idSequence)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid sequence ID"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	uuidPrecedent, err := uuid.Parse(idPrecedent)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid precedent ID"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	err = persistence.DeletePrecedent(&uuidSequence, &uuidPrecedent)
+	res, err := service.DeletePrecedent(uuidSequence, uuidPrecedent)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete precedent"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, uuidSequence.String()+"|"+uuidPrecedent.String())
+	c.JSON(http.StatusOK, res)
 }
 
 func GetOrderedSequences(c *gin.Context) {
 
-	sequences, err := OrderSequences()
+	sequences, err := service.OrderSequences()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to order sequences"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 	c.JSON(http.StatusOK, sequences)

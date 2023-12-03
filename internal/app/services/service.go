@@ -1,17 +1,32 @@
-package api
+package service
 
 import (
 	"fmt"
-	"polonium/internal/pkg/model"
-	"polonium/internal/pkg/persistence"
+	"selenium-manager/internal/pkg/model"
+	"selenium-manager/internal/pkg/persistence"
 
 	"github.com/google/uuid"
 )
 
-func GenerateTests() {
-
+func GetSequences() (*map[uuid.UUID]model.Sequence, error) {
+	return persistence.GetSequences()
 }
 
+func SaveSequence(json model.Sequence) (string, error) {
+	zero := uuid.UUID{}
+	if json.Id.String() == zero.String() {
+		json = *model.NewSequence(json.Name, json.Content)
+	}
+	return json.Id.String(), persistence.SaveSequence(&json)
+}
+
+func DeleteSequence(id uuid.UUID) (string, error) {
+	return id.String(), persistence.DeleteSequence(&id)
+}
+
+func DeletePrecedent(idSequence uuid.UUID, idPrecedent uuid.UUID) (string, error) {
+	return idSequence.String() + "|" + idPrecedent.String(), persistence.DeletePrecedent(&idSequence, &idPrecedent)
+}
 func OrderSequences() ([]model.Sequence, error) {
 	sequences, err := persistence.GetSequences()
 	if err != nil {

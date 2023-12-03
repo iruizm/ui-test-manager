@@ -1,7 +1,7 @@
 package main
 
 import (
-	api "polonium/internal/app"
+	api "selenium-manager/internal/app/api"
 )
 
 func main() {

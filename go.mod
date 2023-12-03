@@ -1,4 +1,4 @@
-module polonium
+module selenium-manager
 
 go 1.20
 

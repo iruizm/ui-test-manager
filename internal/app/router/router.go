@@ -1,11 +1,12 @@
-package api
+package router
 
 import (
 	"fmt"
 	"io"
 	"os"
 	"path/filepath"
-	"polonium/internal/pkg/configuration"
+	controller "selenium-manager/internal/app/controllers"
+	"selenium-manager/internal/pkg/configuration"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -38,11 +39,11 @@ func Setup() *gin.Engine {
 	}))
 	app.Use(gin.Recovery())
 
-	app.GET("/api/sequences", GetSequences)
-	app.GET("/api/order", GetOrderedSequences)
-	app.POST("/api/sequences", SaveSequence)
-	app.DELETE("/api/sequences/:id", DeleteSequence)
-	app.DELETE("/api/sequences/:id/:idPrecedent", DeletePrecedent)
+	app.GET("/api/sequences", controller.GetSequences)
+	app.GET("/api/order", controller.GetOrderedSequences)
+	app.POST("/api/sequences", controller.SaveSequence)
+	app.DELETE("/api/sequences/:id", controller.DeleteSequence)
+	app.DELETE("/api/sequences/:id/:idPrecedent", controller.DeletePrecedent)
 
 	// ================== Docs Routes
 	app.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))

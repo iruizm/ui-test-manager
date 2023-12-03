@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
-	"polonium/internal/pkg/configuration"
-	"polonium/internal/pkg/model"
+	"selenium-manager/internal/pkg/configuration"
+	"selenium-manager/internal/pkg/model"
 	"sync"
 
 	"github.com/google/uuid"

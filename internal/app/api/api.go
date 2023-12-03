@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"polonium/internal/pkg/configuration"
+	router "selenium-manager/internal/app/router"
+	configuration "selenium-manager/internal/pkg/configuration"
 )
 
 func Run() {
@@ -16,6 +17,6 @@ func Run() {
 	}
 	configPath = filepath.Join(filepath.Dir(filepath.Dir(exeDir)), "configs", "config.json")
 	configuration.Setup(&configPath)
-	backend := Setup()
+	backend := router.Setup()
 	backend.Run("localhost:" + configuration.Config.BackPort)
 }
