@@ -27,6 +27,7 @@ func DeleteSequence(id uuid.UUID) (string, error) {
 func DeletePrecedent(idSequence uuid.UUID, idPrecedent uuid.UUID) (string, error) {
 	return idSequence.String() + "|" + idPrecedent.String(), persistence.DeletePrecedent(&idSequence, &idPrecedent)
 }
+
 func OrderSequences() ([]model.Sequence, error) {
 	sequences, err := persistence.GetSequences()
 	if err != nil {
@@ -72,4 +73,8 @@ func OrderSequences() ([]model.Sequence, error) {
 	}
 
 	return result, nil
+}
+
+func ReplacePattern(*model.Sequence) {
+
 }
