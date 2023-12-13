@@ -88,3 +88,46 @@ func GetOrderedSequences(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, sequences)
 }
+
+func GetPatterns(c *gin.Context) {
+	patterns, err := service.GetPatterns()
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	}
+	c.JSON(http.StatusOK, *patterns)
+}
+
+func SavePattern(c *gin.Context) {
+	var json model.Pattern
+	err := c.ShouldBindJSON(&json)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	res, err := service.SavePattern(json)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, res)
+}
+
+func DeletePattern(c *gin.Context) {
+
+	id := c.Param("id")
+	if id == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Missing sequence ID"})
+		return
+	}
+	uuid, err := uuid.Parse(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	res, err := service.DeletePattern(uuid)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, res)
+}

@@ -1,5 +1,5 @@
 <template>
-    <v-card>
+    <v-card style="height: 100%">
       <v-card-text>
         <div ref="container" style="border: 2px solid #333333"></div>
       </v-card-text>
@@ -19,7 +19,7 @@ let selectedNode = null
 
 const graphResize = () => {
   if (container.value) {
-    container.value.style.height = `${window.innerHeight - 138}px`;
+    container.value.style.height = `${window.innerHeight - 169}px`;
   }
 };
 

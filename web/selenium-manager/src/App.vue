@@ -1,23 +1,33 @@
 <template>
-    <ClientAPI />
+  <ClientAPI />
   <v-app>
-    <v-app-bar color="teal-darken-3"/> 
+    <v-app-bar color="teal-darken-3" elevation="2">
+      <v-tabs v-model="tab" grow>
+        <v-tab value="1"> Scripts </v-tab>
+        <v-tab value="2"> Patterns </v-tab>
+      </v-tabs>
+    </v-app-bar>
 
-    <!-- <v-navigation-drawer>
-      <v-list>
-        <v-list-item title="Navigation drawer"></v-list-item>
-      </v-list>
-    </v-navigation-drawer> -->
-    
     <v-main>
       <v-container>
-        <v-row>
-          <v-col cols="6">
-            <FileTable />
-          </v-col>
-          <v-col cols="6">
-            <SequenceGraph />
-          </v-col>
+        <v-window v-model="tab">
+          <v-window-item value="1">
+            <v-row>
+              <v-col cols="6">
+                <FileTable />
+              </v-col>
+              <v-col cols="6">
+                <SequenceGraph />
+              </v-col>
+            </v-row>
+          </v-window-item>
+          <v-window-item value="2">
+            <PatternTable/>
+          </v-window-item>
+        </v-window>
+
+        <v-row value="2">
+
         </v-row>
       </v-container>
     </v-main>
@@ -25,15 +35,20 @@
 </template>
 
 <script setup>
-// import HelloWorld from './components/HelloWorld.vue';
 import FileTable from '@/components/FileTable.vue'
 import SequenceGraph from '@/components/SequenceGraph.vue'
+import PatternTable from '@/components/PatternTable.vue'
 import ClientAPI from '@/services/ClientAPI.vue'
-import { provide, onMounted } from 'vue';
+import { provide, onMounted, ref } from 'vue';
 import mitt from 'mitt';
 
 const eventBus = mitt();
 provide('eventBus', eventBus);
 
-onMounted(() => eventBus.emit("get-sequences"))
+const tab = ref(1)
+
+onMounted(() => {
+  eventBus.emit("get-sequences")
+  eventBus.emit("get-patterns")
+});
 </script>

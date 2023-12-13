@@ -41,8 +41,11 @@ func Setup() *gin.Engine {
 
 	app.GET("/api/sequences", controller.GetSequences)
 	app.GET("/api/order", controller.GetOrderedSequences)
+	app.GET("/api/patterns", controller.GetPatterns)
 	app.POST("/api/sequences", controller.SaveSequence)
+	app.POST("/api/patterns", controller.SavePattern)
 	app.DELETE("/api/sequences/:id", controller.DeleteSequence)
+	app.DELETE("/api/patterns/:id", controller.DeletePattern)
 	app.DELETE("/api/sequences/:id/:idPrecedent", controller.DeletePrecedent)
 
 	// ================== Docs Routes

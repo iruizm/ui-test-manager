@@ -75,6 +75,22 @@ func OrderSequences() ([]model.Sequence, error) {
 	return result, nil
 }
 
-func ReplacePattern(*model.Sequence) {
+func GetPatterns() (*map[uuid.UUID]model.Pattern, error) {
+	return persistence.GetPatterns()
+}
+
+func SavePattern(json model.Pattern) (string, error) {
+	zero := uuid.UUID{}
+	if json.Id.String() == zero.String() {
+		json = *model.NewPattern()
+	}
+	return json.Id.String(), persistence.SavePattern(&json)
+}
+
+func DeletePattern(id uuid.UUID) (string, error) {
+	return id.String(), persistence.DeletePattern(&id)
+}
+
+func ReplacePattern(*model.Pattern) {
 
 }

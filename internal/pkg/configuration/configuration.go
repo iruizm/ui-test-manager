@@ -11,6 +11,7 @@ var Config *Configuration
 type Configuration struct {
 	DataPath      string `json:"data_path"`
 	SequencesPath string `json:"sequences_path"`
+	PatternsPath  string `json:"patterns_path"`
 	LoggingPath   string `json:"logging_path"`
 	BackPort      string `json:"back_port"`
 	FrontPort     string `json:"front_port"`

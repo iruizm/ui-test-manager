@@ -1,12 +1,10 @@
 <template>
-  <v-card>
+  <v-card style="height: 100%">
     <v-toolbar color="teal-darken-3" density="comfortable" floating>
-      <v-toolbar-title> <v-icon>mdi-playlist-check</v-icon> Scripts</v-toolbar-title>
 
+
+      <v-text-field v-model="searchText" append-icon="mdi-magnify" label="Search" single-line hide-details></v-text-field>
       <v-spacer></v-spacer>
-
-      <v-text-field v-model="searchText" prepend-icon="mdi-magnify" label="Search" single-line
-        hide-details></v-text-field>
       <v-tooltip text="Add" location="top">
         <template v-slot:activator="{ props }">
           <v-btn v-bind="props" variant="text" icon="mdi-plus-box" @click="openFileManager"></v-btn>
@@ -18,34 +16,38 @@
         </template>
       </v-tooltip>
     </v-toolbar>
-
-    <v-card-text>
-      <v-list elevation="4" class="ma-2" color="indigo-darken-3" style="height: 100%">
-        <v-list-item elevation="1" v-for="sequence in paginatedData" :key="sequence.id" :style="{ height: '65px' }"
-          variant="plain">
-          <template v-slot:prepend>
-            {{ sequence.name }}
-          </template>
-          <v-container v-if="hasPrecedents(sequence)">
-            <v-slide-group show-arrows>
-              <v-slide-group-item v-for="item in sequence.precedents" :key="item">
-                <v-chip class="ma-1" :closable="true" :ripple="true" variant="tonal" size="small"
-                  @click:close="removePrecedent(sequence.id, item)"> {{ store.sequences[item].name }}
-                </v-chip>
-              </v-slide-group-item>
-            </v-slide-group>
-          </v-container>
-          <template v-slot:append>
-            <v-btn-group>
-              <v-btn class="ma-1" icon="mdi-eye" @click="openContentDialog(sequence)">
-              </v-btn>
-              <v-btn @click="removeElement(sequence.id)" class="ma-1" icon="mdi-delete"></v-btn>
-            </v-btn-group>
-          </template>
-        </v-list-item>
-      </v-list>
-      <v-pagination small v-model="currentPage" :length="pageCount" @input="changePage"></v-pagination>
-    </v-card-text>
+    <v-list elevation="2" class="ma-2" color="indigo-darken-3">
+      <v-list-item elevation="1" v-for="sequence in paginatedData" :key="sequence.id" :style="{ height: '64px' }"
+        variant="plain">
+        <template v-slot:prepend>
+          {{ sequence.name }}
+        </template>
+        <v-container v-if="hasPrecedents(sequence)">
+          <v-slide-group show-arrows>
+            <v-slide-group-item v-for="item in sequence.precedents" :key="item">
+              <v-chip class="ma-1" :closable="true" :ripple="true" variant="tonal" size="small"
+                @click:close="removePrecedent(sequence.id, item)"> {{ store.sequences[item].name }}
+              </v-chip>
+            </v-slide-group-item>
+          </v-slide-group>
+        </v-container>
+        <template v-slot:append>
+          <v-btn-group>
+            <v-tooltip text="View" location="top">
+              <template v-slot:activator="{ props }">
+                <v-btn v-bind="props" class="ma-1" icon="mdi-eye" @click="openContentDialog(sequence)"></v-btn>
+              </template>
+            </v-tooltip>
+            <v-tooltip text="Remove" location="top">
+              <template v-slot:activator="{ props }">
+                <v-btn v-bind="props" @click="removeElement(sequence.id)" class="ma-1" icon="mdi-delete"></v-btn>
+              </template>
+            </v-tooltip>
+          </v-btn-group>
+        </template>
+      </v-list-item>
+    </v-list>
+    <v-pagination small v-model="currentPage" :length="pageCount" @input="changePage"></v-pagination>
   </v-card>
 
   <template>
@@ -54,7 +56,7 @@
         <v-card class="fullscreen-card">
           <v-card-title>Script</v-card-title>
           <v-card-text>
-            <v-textarea class="full-screen-textarea" v-model="sequenceRef.content"></v-textarea>
+            <v-textarea class="full-screen-textarea" v-model="sequenceRef.content" auto-grow></v-textarea>
           </v-card-text>
           <v-card-actions class="justify-end">
             <v-tooltip text="Save">
@@ -133,26 +135,10 @@ const tableData = computed(() => {
 const itemsPerPage = ref(10);
 const currentPage = ref(1);
 
-const windowHeight = ref(window.innerHeight);
-
-// Function to handle window resize
-const handleResize = () => {
-  windowHeight.value = window.innerHeight;
-};
-
-window.addEventListener('resize', handleResize);
-
-// Watch window width changes and adjust itemsPerPage
-watch(windowHeight, (newHeight) => {
-  itemsPerPage.value = Math.round(newHeight / 90)
-  console.log(itemsPerPage)
-});
-
-
 const filteredData = computed(() => {
   const lowerCaseSearch = searchText.value.toLowerCase();
   return tableData.value.filter(sequence =>
-    sequence.name.toLowerCase().includes(lowerCaseSearch)
+    sequence.name?.toLowerCase().includes(lowerCaseSearch)
   );
 });
 

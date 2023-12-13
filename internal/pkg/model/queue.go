@@ -1,7 +1,5 @@
 package model
 
-import "fmt"
-
 type Queue struct {
 	items []interface{}
 }
@@ -29,21 +27,4 @@ func (q *Queue) IsEmpty() bool {
 
 func (q *Queue) Size() int {
 	return len(q.items)
-}
-
-func main() {
-	queue := NewQueue()
-
-	// Enqueue some items
-	queue.Enqueue(1)
-	queue.Enqueue(2)
-	queue.Enqueue(3)
-
-	// Dequeue and print items
-	for !queue.IsEmpty() {
-		item, ok := queue.Dequeue()
-		if ok {
-			fmt.Println("Dequeued:", item)
-		}
-	}
 }
