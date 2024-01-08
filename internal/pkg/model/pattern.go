@@ -13,7 +13,7 @@ type Pattern struct {
 
 func NewPattern() *Pattern {
 	return &Pattern{
-		Name:        "",
+		Name:        "Pattern",
 		Id:          uuid.New(),
 		Regex:       "",
 		Replacement: "",

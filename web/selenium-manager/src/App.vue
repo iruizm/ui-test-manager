@@ -45,7 +45,7 @@ import mitt from 'mitt';
 const eventBus = mitt();
 provide('eventBus', eventBus);
 
-const tab = ref(1)
+const tab = ref(0)
 
 onMounted(() => {
   eventBus.emit("get-sequences")

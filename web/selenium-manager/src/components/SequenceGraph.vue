@@ -66,6 +66,7 @@ onMounted(() => {
   network = new Network(container.value, data, options);
 
   watch(() => store.sequences, () => {
+    console.log(data.nodes)
     data.nodes = new DataSet(Object.keys(store.sequences).map((key) => ({ id: store.sequences[key].id, label: store.sequences[key].name })));
     data.edges = new DataSet(Object.keys(store.sequences).flatMap((key) =>
       store.sequences[key].precedents.map((precedent) => ({ from: precedent, to: store.sequences[key].id }))

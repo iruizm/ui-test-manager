@@ -10,6 +10,7 @@ var Config *Configuration
 
 type Configuration struct {
 	DataPath      string `json:"data_path"`
+	ConfigPath    string `json:"config_path"`
 	SequencesPath string `json:"sequences_path"`
 	PatternsPath  string `json:"patterns_path"`
 	LoggingPath   string `json:"logging_path"`

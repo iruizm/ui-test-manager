@@ -6,7 +6,7 @@ import { store } from '../data/store.js'
 const eventBus = inject('eventBus')
 eventBus.on("get-sequences", getSequences)
 eventBus.on("get-patterns", getPatterns)
-eventBus.on("order-sequences", orderSequences)
+eventBus.on("get-tests", getTests)
 eventBus.on("save-sequence", saveSequence)
 eventBus.on("save-pattern", savePattern)
 eventBus.on("delete-sequence", deleteSequence)
@@ -25,6 +25,14 @@ async function getPatterns() {
   try {
     const res = await axios.get('http://localhost:8080/api/patterns');
     store.patterns = res.data
+  } catch (error) {
+    console.error('Error fetching data:', error);
+  }
+}
+async function getTests() {
+  try {
+    const res = await axios.get('http://localhost:8080/api/tests');
+    store.tests = res.data
   } catch (error) {
     console.error('Error fetching data:', error);
   }
@@ -67,14 +75,6 @@ async function deletePrecedent(e) {
   try {
     await axios.delete(`http://localhost:8080/api/sequences/${e.idSequence}/${e.idPrecedent}`);
     await getSequences()
-  } catch (error) {
-    console.error('Error fetching data:', error);
-  }
-}
-async function orderSequences() {
-  try {
-    const res = await axios.get(`http://localhost:8080/api/order`);
-    store.ordered = res.data
   } catch (error) {
     console.error('Error fetching data:', error);
   }

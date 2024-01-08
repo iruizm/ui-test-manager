@@ -125,9 +125,7 @@ function changePage(page) {
 }
 
 async function addElement(event) {
-  const pattern = {
-    name: "",
-  };
+  const pattern = {};
   eventBus.emit("save-pattern", pattern);
   event.target.value = ''
 }

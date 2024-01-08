@@ -1,5 +1,6 @@
 {
     "data_path": "data",
+    "config_path": "configs",
     "sequences_path": "sequences.json",
     "patterns_path": "patterns.json",
     "logging_path": "api.log",

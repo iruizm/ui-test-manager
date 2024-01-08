@@ -79,14 +79,13 @@ func DeletePrecedent(c *gin.Context) {
 	c.JSON(http.StatusOK, res)
 }
 
-func GetOrderedSequences(c *gin.Context) {
-
-	sequences, err := service.OrderSequences()
+func GetTests(c *gin.Context) {
+	tests, err := service.GetTests()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, sequences)
+	c.JSON(http.StatusOK, tests)
 }
 
 func GetPatterns(c *gin.Context) {

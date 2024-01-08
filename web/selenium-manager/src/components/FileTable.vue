@@ -86,7 +86,7 @@
         </v-toolbar>
         <v-card-text>
           <v-list elevation="4" height="670px" class="ma-2" color="indigo-darken-3">
-            <v-list-item elevation="1" v-for="test in store.ordered" :key="test.id" :style="{ height: '65px' }"
+            <v-list-item elevation="1" v-for="test in store.tests" :key="test.id" :style="{ height: '65px' }"
               variant="plain">
               <template v-slot:prepend>
                 {{ test.name }}
@@ -159,10 +159,6 @@ watch(searchText, () => {
 
 function changePage(page) {
   currentPage.value = page;
-}
-
-async function generateTests() {
-  eventBus.emit("order-sequences")
 }
 
 async function addElements(event) {
@@ -246,10 +242,14 @@ function closeGenerateDialog() {
   generateVisible.value = false;
 }
 
+function generateTests(){
+  eventBus.emit("get-tests")
+}
+
 function generateFiles() {
   const zip = new JSZip();
-  var padding = store.ordered.length.toString().length + 1
-  store.ordered.forEach((element, index) => {
+  var padding = store.tests.length.toString().length + 1
+  store.tests.forEach((element, index) => {
     const fileName = `test_${(index + 1).toString().padStart(padding, '0')}_${element.name}.py`;
     const fileContent = element.content;
     zip.file(fileName, fileContent);

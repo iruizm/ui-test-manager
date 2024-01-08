@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"selenium-manager/internal/pkg/model"
 	"selenium-manager/internal/pkg/persistence"
+	"strings"
 
 	"github.com/google/uuid"
 )
@@ -69,7 +70,7 @@ func OrderSequences() ([]model.Sequence, error) {
 	}
 
 	if len(result) != len(*sequences) {
-		return nil, fmt.Errorf("graph contains a cycle")
+		return nil, fmt.Errorf("graph contains a cycle can't sort nodes")
 	}
 
 	return result, nil
@@ -91,6 +92,21 @@ func DeletePattern(id uuid.UUID) (string, error) {
 	return id.String(), persistence.DeletePattern(&id)
 }
 
-func ReplacePattern(*model.Pattern) {
+func GetTests() ([]model.Sequence, error) {
+	o, err := OrderSequences()
+	if err != nil {
+		return nil, err
+	}
+	patterns, err := GetPatterns()
+	if err != nil {
+		return nil, err
+	}
 
+	for k, s := range o {
+		for _, p := range *patterns {
+			s.Content = strings.Replace(s.Content, p.Regex, p.Replacement, -1)
+			o[k] = s
+		}
+	}
+	return o, nil
 }

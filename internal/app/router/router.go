@@ -40,8 +40,8 @@ func Setup() *gin.Engine {
 	app.Use(gin.Recovery())
 
 	app.GET("/api/sequences", controller.GetSequences)
-	app.GET("/api/order", controller.GetOrderedSequences)
 	app.GET("/api/patterns", controller.GetPatterns)
+	app.GET("/api/tests", controller.GetTests)
 	app.POST("/api/sequences", controller.SaveSequence)
 	app.POST("/api/patterns", controller.SavePattern)
 	app.DELETE("/api/sequences/:id", controller.DeleteSequence)
