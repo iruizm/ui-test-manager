@@ -42,27 +42,32 @@
     <v-col v-if="selected != null" cols="6">
       <v-card style="height: 100%" class="fullscreen-card">
         <v-toolbar color="teal-darken-3" density="comfortable" floating>
-          <v-toolbar-title>Pattern</v-toolbar-title>
+          <v-toolbar-title>Rule</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <!-- <v-switch v-model="selected.mode" hide-details
+            :label="`Replace: ${selected.mode}`"></v-switch> -->
           <v-spacer></v-spacer>
           <v-tooltip text="Save" location="top">
             <template v-slot:activator="{ props }">
               <v-btn v-bind="props" variant="text" icon="mdi-content-save" @click="saveElement()"></v-btn>
             </template>
           </v-tooltip>
+
         </v-toolbar>
         <v-row>
           <v-col cols="12">
             <v-text-field label="Name" v-model="selected.name"></v-text-field>
+
           </v-col>
           <v-col cols="12">
             <v-card-text>
-              <v-textarea label="Original" class="full-screen-textarea" rows="10" v-model="selected.regex"></v-textarea>
+              <v-textarea label="Before" class="full-screen-textarea" rows="10" v-model="selected.before"></v-textarea>
             </v-card-text>
           </v-col>
           <v-col cols="12">
             <v-card-text>
-              <v-textarea label="Replacement" class="full-screen-textarea" rows="10"
-                v-model="selected.replacement"></v-textarea>
+              <v-textarea label="After" class="full-screen-textarea" rows="10"
+                v-model="selected.after"></v-textarea>
             </v-card-text>
           </v-col>
         </v-row>
@@ -114,10 +119,8 @@ watch(searchText, () => {
 });
 
 const selected = ref(null)
-
 function showPattern(pattern) {
   selected.value = pattern
-  console.log(selected.value)
 }
 
 function changePage(page) {

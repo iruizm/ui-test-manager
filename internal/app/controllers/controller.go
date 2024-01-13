@@ -2,8 +2,8 @@ package controller
 
 import (
 	"net/http"
-	service "selenium-manager/internal/app/services"
-	"selenium-manager/internal/pkg/model"
+	service "ui-test-manager/internal/app/services"
+	"ui-test-manager/internal/pkg/model"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"

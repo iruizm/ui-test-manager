@@ -5,17 +5,19 @@ import (
 )
 
 type Pattern struct {
-	Name        string    `json:"name"`
-	Id          uuid.UUID `json:"id"`
-	Regex       string    `json:"regex"`
-	Replacement string    `json:"replacement"`
+	Name    string    `json:"name"`
+	Id      uuid.UUID `json:"id"`
+	Before  string    `json:"before"`
+	After   string    `json:"after"`
+	Replace bool      `json:"replace"`
 }
 
 func NewPattern() *Pattern {
 	return &Pattern{
-		Name:        "Pattern",
-		Id:          uuid.New(),
-		Regex:       "",
-		Replacement: "",
+		Name:    "Rule",
+		Id:      uuid.New(),
+		Before:  "",
+		After:   "",
+		Replace: false,
 	}
 }

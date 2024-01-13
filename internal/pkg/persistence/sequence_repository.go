@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
-	"selenium-manager/internal/pkg/configuration"
-	"selenium-manager/internal/pkg/model"
 	"sync"
+	"ui-test-manager/internal/pkg/configuration"
+	"ui-test-manager/internal/pkg/model"
 
 	"github.com/google/uuid"
 )

@@ -1,4 +1,4 @@
-# selenium-manager
+# ui-test-manager
 
 ## Project setup
 ```

@@ -2,9 +2,9 @@ package service
 
 import (
 	"fmt"
-	"selenium-manager/internal/pkg/model"
-	"selenium-manager/internal/pkg/persistence"
 	"strings"
+	"ui-test-manager/internal/pkg/model"
+	"ui-test-manager/internal/pkg/persistence"
 
 	"github.com/google/uuid"
 )
@@ -104,8 +104,10 @@ func GetTests() ([]model.Sequence, error) {
 
 	for k, s := range o {
 		for _, p := range *patterns {
-			s.Content = strings.Replace(s.Content, p.Regex, p.Replacement, -1)
-			o[k] = s
+			if p.Replace {
+				s.Content = strings.Replace(s.Content, p.Before, p.After, -1)
+				o[k] = s
+			}
 		}
 	}
 	return o, nil

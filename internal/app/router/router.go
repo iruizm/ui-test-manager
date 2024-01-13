@@ -5,8 +5,8 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	controller "selenium-manager/internal/app/controllers"
-	"selenium-manager/internal/pkg/configuration"
+	controller "ui-test-manager/internal/app/controllers"
+	"ui-test-manager/internal/pkg/configuration"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -18,7 +18,7 @@ func Setup() *gin.Engine {
 	app := gin.New()
 
 	config := cors.DefaultConfig()
-	config.AllowOrigins = []string{"http://localhost:" + configuration.Config.FrontPort}
+	config.AllowOrigins = []string{"http://localhost:" + configuration.Config.FrontPort, "http://192.168.1.1:" + configuration.Config.FrontPort}
 	app.Use(cors.New(config))
 
 	f, _ := os.Create(filepath.Join(configuration.Config.DataPath, configuration.Config.LoggingPath))

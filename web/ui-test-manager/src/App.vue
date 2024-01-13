@@ -4,7 +4,7 @@
     <v-app-bar color="teal-darken-3" elevation="2">
       <v-tabs v-model="tab" grow>
         <v-tab value="1"> Scripts </v-tab>
-        <v-tab value="2"> Patterns </v-tab>
+        <v-tab value="2"> Rules </v-tab>
       </v-tabs>
     </v-app-bar>
 

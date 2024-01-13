@@ -1,7 +1,7 @@
 package main
 
 import (
-	api "selenium-manager/internal/app/api"
+	api "ui-test-manager/internal/app/api"
 )
 
 func main() {

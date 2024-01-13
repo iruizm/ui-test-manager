@@ -1,4 +1,4 @@
-module selenium-manager
+module ui-test-manager
 
 go 1.20
 

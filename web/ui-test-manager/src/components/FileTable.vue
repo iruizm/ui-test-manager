@@ -1,8 +1,6 @@
 <template>
   <v-card style="height: 100%">
     <v-toolbar color="teal-darken-3" density="comfortable" floating>
-
-
       <v-text-field v-model="searchText" append-icon="mdi-magnify" label="Search" single-line hide-details></v-text-field>
       <v-spacer></v-spacer>
       <v-tooltip text="Add" location="top">
@@ -242,7 +240,7 @@ function closeGenerateDialog() {
   generateVisible.value = false;
 }
 
-function generateTests(){
+function generateTests() {
   eventBus.emit("get-tests")
 }
 

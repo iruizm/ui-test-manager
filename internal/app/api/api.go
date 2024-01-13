@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	router "selenium-manager/internal/app/router"
-	configuration "selenium-manager/internal/pkg/configuration"
+	router "ui-test-manager/internal/app/router"
+	configuration "ui-test-manager/internal/pkg/configuration"
 )
 
 func Run() {
