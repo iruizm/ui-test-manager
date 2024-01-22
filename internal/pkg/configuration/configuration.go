@@ -6,7 +6,15 @@ import (
 	"os"
 )
 
-var Config *Configuration
+var Config Configuration
+
+type Configurator interface {
+	ReadConfig(configPath string) (*Configuration, error)
+}
+
+func SetConfig(config *Configuration) {
+	Config = *config
+}
 
 type Configuration struct {
 	DataPath      string `json:"data_path"`
@@ -18,15 +26,22 @@ type Configuration struct {
 	FrontPort     string `json:"front_port"`
 }
 
-func Setup(configPath *string) {
-	configFile, err := os.ReadFile(*configPath)
+func SetupConfigurator(configurator Configurator, configPath string) (*Configuration, error) {
+	return configurator.ReadConfig(configPath)
+}
+
+type FileConfigurator struct{}
+
+func (c *FileConfigurator) ReadConfig(configPath string) (*Configuration, error) {
+	configFile, err := os.ReadFile(configPath)
 	if err != nil {
-		fmt.Println("Error reading config file:", err)
-		os.Exit(1)
+		return nil, fmt.Errorf("error reading config file: %w", err)
 	}
 
-	if err := json.Unmarshal(configFile, &Config); err != nil {
-		fmt.Println("Error parsing config file:", err)
-		os.Exit(1)
+	var config Configuration
+	if err := json.Unmarshal(configFile, &config); err != nil {
+		return nil, fmt.Errorf("error parsing config file: %w", err)
 	}
+
+	return &config, nil
 }

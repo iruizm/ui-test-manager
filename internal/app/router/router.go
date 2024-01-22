@@ -14,7 +14,7 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
-func Setup() *gin.Engine {
+func Setup(controller *controller.Controller) *gin.Engine {
 	app := gin.New()
 
 	config := cors.DefaultConfig()

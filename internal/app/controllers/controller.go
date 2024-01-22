@@ -9,124 +9,134 @@ import (
 	"github.com/google/uuid"
 )
 
-func GetSequences(c *gin.Context) {
-	sequences, err := service.GetSequences()
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-	}
-	c.JSON(http.StatusOK, *sequences)
+type Controller struct {
+	s service.Service
 }
 
-func SaveSequence(c *gin.Context) {
+func NewController(s *service.Service) *Controller {
+	return &Controller{
+		s: *s,
+	}
+}
+
+func (c *Controller) GetSequences(ctx *gin.Context) {
+	sequences, err := c.s.GetSequences()
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, *sequences)
+}
+
+func (c *Controller) SaveSequence(ctx *gin.Context) {
 	var json model.Sequence
-	err := c.ShouldBindJSON(&json)
+	err := ctx.ShouldBindJSON(&json)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	res, err := service.SaveSequence(json)
+	res, err := c.s.SaveSequence(json)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, res)
+	ctx.JSON(http.StatusOK, res)
 }
 
-func DeleteSequence(c *gin.Context) {
-
-	id := c.Param("id")
+func (c *Controller) DeleteSequence(ctx *gin.Context) {
+	id := ctx.Param("id")
 	if id == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Missing sequence ID"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Missing sequence ID"})
 		return
 	}
 	uuid, err := uuid.Parse(id)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	res, err := service.DeleteSequence(uuid)
+	res, err := c.s.DeleteSequence(uuid)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, res)
+	ctx.JSON(http.StatusOK, res)
 }
 
-func DeletePrecedent(c *gin.Context) {
+func (c *Controller) GetPatterns(ctx *gin.Context) {
+	patterns, err := c.s.GetPatterns()
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, *patterns)
+}
 
-	idSequence, idPrecedent := c.Param("id"), c.Param("idPrecedent")
+func (c *Controller) SavePattern(ctx *gin.Context) {
+	var json model.Pattern
+	err := ctx.ShouldBindJSON(&json)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	res, err := c.s.SavePattern(json)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, res)
+}
+
+func (c *Controller) DeletePattern(ctx *gin.Context) {
+	id := ctx.Param("id")
+	if id == "" {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Missing sequence ID"})
+		return
+	}
+	uuid, err := uuid.Parse(id)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	res, err := c.s.DeletePattern(uuid)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, res)
+}
+
+func (c *Controller) DeletePrecedent(ctx *gin.Context) {
+
+	idSequence, idPrecedent := ctx.Param("id"), ctx.Param("idPrecedent")
 
 	if idSequence == "" || idPrecedent == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Missing ID"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Missing ID"})
 		return
 	}
 	uuidSequence, err := uuid.Parse(idSequence)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	uuidPrecedent, err := uuid.Parse(idPrecedent)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	res, err := service.DeletePrecedent(uuidSequence, uuidPrecedent)
+	res, err := c.s.DeletePrecedent(uuidSequence, uuidPrecedent)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, res)
+	ctx.JSON(http.StatusOK, res)
 }
 
-func GetTests(c *gin.Context) {
-	tests, err := service.GetTests()
+func (c *Controller) GetTests(ctx *gin.Context) {
+	tests, err := c.s.GetTests()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, tests)
-}
-
-func GetPatterns(c *gin.Context) {
-	patterns, err := service.GetPatterns()
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-	}
-	c.JSON(http.StatusOK, *patterns)
-}
-
-func SavePattern(c *gin.Context) {
-	var json model.Pattern
-	err := c.ShouldBindJSON(&json)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-	res, err := service.SavePattern(json)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-	c.JSON(http.StatusOK, res)
-}
-
-func DeletePattern(c *gin.Context) {
-
-	id := c.Param("id")
-	if id == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Missing sequence ID"})
-		return
-	}
-	uuid, err := uuid.Parse(id)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-	res, err := service.DeletePattern(uuid)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-	c.JSON(http.StatusOK, res)
+	ctx.JSON(http.StatusOK, tests)
 }

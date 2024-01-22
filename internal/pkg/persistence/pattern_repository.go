@@ -11,90 +11,87 @@ import (
 	"github.com/google/uuid"
 )
 
-type PatternMap struct {
-	MapData map[uuid.UUID]model.Pattern `json:"map_data"`
-	mu      sync.Mutex
+type PatternRepository interface {
+	GetPatterns() (*map[uuid.UUID]model.Pattern, error)
+	SavePattern(pattern *model.Pattern) error
+	DeletePattern(id uuid.UUID) error
 }
 
-var patternMap *PatternMap
+type FilePatternRepository struct {
+	filePath string
+	dataPath string
+	mu       sync.Mutex
+}
 
-func GetPatterns() (*map[uuid.UUID]model.Pattern, error) {
-	patterns, err := getPatternMap()
-	if err != nil {
+func NewFilePatternRepository(filePath, dataPath string) *FilePatternRepository {
+	return &FilePatternRepository{
+		filePath: filePath,
+		dataPath: dataPath,
+	}
+}
+
+func (r *FilePatternRepository) GetPatterns() (*map[uuid.UUID]model.Pattern, error) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	file, errRead := os.ReadFile(filepath.Join(r.dataPath, r.filePath))
+	if errRead != nil {
+		if os.IsNotExist(errRead) {
+			patternMap := make(map[uuid.UUID]model.Pattern)
+			return &patternMap, nil
+		}
+		return nil, errRead
+	}
+
+	var patternMap map[uuid.UUID]model.Pattern
+	if err := json.Unmarshal(file, &patternMap); err != nil {
 		return nil, err
 	}
-	return &patterns.MapData, nil
+
+	return &patternMap, nil
 }
 
-func SavePattern(pattern *model.Pattern) error {
-	patterns, err := getPatternMap()
+func (r *FilePatternRepository) SavePattern(pattern *model.Pattern) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	patternMap, err := r.GetPatterns()
 	if err != nil {
 		return err
 	}
-	patterns.mu.Lock()
-	defer patterns.mu.Unlock()
-	patterns.MapData[pattern.Id] = *pattern
-	err = patterns.saveMap()
+
+	(*patternMap)[pattern.Id] = *pattern
+
+	return r.saveMap(patternMap)
+}
+
+func (r *FilePatternRepository) DeletePattern(id uuid.UUID) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	patternMap, err := r.GetPatterns()
 	if err != nil {
 		return err
 	}
-	return nil
+
+	delete(*patternMap, id)
+
+	return r.saveMap(patternMap)
 }
 
-func DeletePattern(id *uuid.UUID) error {
-	patterns, err := getPatternMap()
-	if err != nil {
-		return err
-	}
-	patterns.mu.Lock()
-	defer patterns.mu.Unlock()
-	delete(patterns.MapData, *id)
-	err = patterns.saveMap()
-	if err != nil {
-		return err
-	}
-	return nil
-}
-func getPatternMap() (*PatternMap, error) {
-	if patternMap == nil {
-		file, errRead := os.ReadFile(filepath.Join(configuration.Config.DataPath, configuration.Config.PatternsPath))
-		if errRead != nil {
-			if os.IsNotExist(errRead) {
-				patternMap = &PatternMap{
-					MapData: make(map[uuid.UUID]model.Pattern),
-					mu:      sync.Mutex{},
-				}
-
-				jsonData, errMarshal := json.Marshal(patternMap)
-				if errMarshal != nil {
-					return nil, errMarshal
-				}
-
-				if errWrite := os.WriteFile(filepath.Join(configuration.Config.DataPath, configuration.Config.PatternsPath), jsonData, 0644); errWrite != nil {
-					return nil, errWrite
-				}
-
-			} else {
-				return nil, errRead
-			}
-		} else {
-			if err := json.Unmarshal(file, &patternMap); err != nil {
-				return nil, err
-			}
-		}
-
-	}
-	return patternMap, nil
-}
-
-func (s *PatternMap) saveMap() error {
-
-	jsonData, errMarshal := json.MarshalIndent(&s, "", "  ")
+func (r *FilePatternRepository) saveMap(patternMap *map[uuid.UUID]model.Pattern) error {
+	jsonData, errMarshal := json.MarshalIndent(patternMap, "", "  ")
 	if errMarshal != nil {
 		return errMarshal
 	}
-	if errWrite := os.WriteFile(filepath.Join(configuration.Config.DataPath, configuration.Config.PatternsPath), jsonData, 0644); errWrite != nil {
+
+	if errWrite := os.WriteFile(filepath.Join(r.dataPath, r.filePath), jsonData, 0644); errWrite != nil {
 		return errWrite
 	}
+
 	return nil
+}
+
+func GetPatternRepository() PatternRepository {
+	return NewFilePatternRepository(configuration.Config.PatternsPath, configuration.Config.DataPath)
 }

@@ -9,28 +9,40 @@ import (
 	"github.com/google/uuid"
 )
 
-func GetSequences() (*map[uuid.UUID]model.Sequence, error) {
-	return persistence.GetSequences()
+type Service struct {
+	sequenceRepo persistence.SequenceRepository
+	patternRepo  persistence.PatternRepository
 }
 
-func SaveSequence(json model.Sequence) (string, error) {
+func NewService(sequenceRepo persistence.SequenceRepository, patternRepo persistence.PatternRepository) *Service {
+	return &Service{
+		sequenceRepo: sequenceRepo,
+		patternRepo:  patternRepo,
+	}
+}
+
+func (s *Service) GetSequences() (*map[uuid.UUID]model.Sequence, error) {
+	return s.sequenceRepo.GetSequences()
+}
+
+func (s *Service) SaveSequence(json model.Sequence) (string, error) {
 	zero := uuid.UUID{}
 	if json.Id.String() == zero.String() {
 		json = *model.NewSequence(json.Name, json.Content)
 	}
-	return json.Id.String(), persistence.SaveSequence(&json)
+	return json.Id.String(), s.sequenceRepo.SaveSequence(&json)
 }
 
-func DeleteSequence(id uuid.UUID) (string, error) {
-	return id.String(), persistence.DeleteSequence(&id)
+func (s *Service) DeleteSequence(id uuid.UUID) (string, error) {
+	return id.String(), s.sequenceRepo.DeleteSequence(id)
 }
 
-func DeletePrecedent(idSequence uuid.UUID, idPrecedent uuid.UUID) (string, error) {
-	return idSequence.String() + "|" + idPrecedent.String(), persistence.DeletePrecedent(&idSequence, &idPrecedent)
+func (s *Service) DeletePrecedent(idSequence uuid.UUID, idPrecedent uuid.UUID) (string, error) {
+	return idSequence.String() + "|" + idPrecedent.String(), s.sequenceRepo.DeletePrecedent(idSequence, idPrecedent)
 }
 
-func OrderSequences() ([]model.Sequence, error) {
-	sequences, err := persistence.GetSequences()
+func (s *Service) OrderSequences() ([]model.Sequence, error) {
+	sequences, err := s.sequenceRepo.GetSequences()
 	if err != nil {
 		return nil, err
 	}
@@ -76,37 +88,37 @@ func OrderSequences() ([]model.Sequence, error) {
 	return result, nil
 }
 
-func GetPatterns() (*map[uuid.UUID]model.Pattern, error) {
-	return persistence.GetPatterns()
+func (s *Service) GetPatterns() (*map[uuid.UUID]model.Pattern, error) {
+	return s.patternRepo.GetPatterns()
 }
 
-func SavePattern(json model.Pattern) (string, error) {
+func (s *Service) SavePattern(json model.Pattern) (string, error) {
 	zero := uuid.UUID{}
 	if json.Id.String() == zero.String() {
 		json = *model.NewPattern()
 	}
-	return json.Id.String(), persistence.SavePattern(&json)
+	return json.Id.String(), s.patternRepo.SavePattern(&json)
 }
 
-func DeletePattern(id uuid.UUID) (string, error) {
-	return id.String(), persistence.DeletePattern(&id)
+func (s *Service) DeletePattern(id uuid.UUID) (string, error) {
+	return id.String(), s.patternRepo.DeletePattern(id)
 }
 
-func GetTests() ([]model.Sequence, error) {
-	o, err := OrderSequences()
+func (s *Service) GetTests() ([]model.Sequence, error) {
+	o, err := s.OrderSequences()
 	if err != nil {
 		return nil, err
 	}
-	patterns, err := GetPatterns()
+	patterns, err := s.GetPatterns()
 	if err != nil {
 		return nil, err
 	}
 
-	for k, s := range o {
+	for k, seq := range o {
 		for _, p := range *patterns {
 			if p.Replace {
-				s.Content = strings.Replace(s.Content, p.Before, p.After, -1)
-				o[k] = s
+				seq.Content = strings.Replace(seq.Content, p.Before, p.After, -1)
+				o[k] = seq
 			}
 		}
 	}

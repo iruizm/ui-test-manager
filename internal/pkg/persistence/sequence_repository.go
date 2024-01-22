@@ -11,126 +11,115 @@ import (
 	"github.com/google/uuid"
 )
 
-type SequenceMap struct {
-	MapData map[uuid.UUID]model.Sequence `json:"map_data"`
-	mu      sync.Mutex
+type SequenceRepository interface {
+	GetSequences() (*map[uuid.UUID]model.Sequence, error)
+	SaveSequence(sequence *model.Sequence) error
+	DeleteSequence(id uuid.UUID) error
+	DeletePrecedent(idSequence uuid.UUID, idPrecedent uuid.UUID) error
 }
 
-var sequenceMap *SequenceMap
+type fileSequenceRepository struct {
+	filePath string
+	dataPath string
+	mu       sync.Mutex
+}
 
-func GetSequences() (*map[uuid.UUID]model.Sequence, error) {
-	sequences, err := getSequenceMap()
-	if err != nil {
+func NewFileSequenceRepository(filePath, dataPath string) SequenceRepository {
+	return &fileSequenceRepository{
+		filePath: filePath,
+		dataPath: dataPath,
+	}
+}
+
+func (r *fileSequenceRepository) GetSequences() (*map[uuid.UUID]model.Sequence, error) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	file, errRead := os.ReadFile(filepath.Join(r.dataPath, r.filePath))
+	if errRead != nil {
+		if os.IsNotExist(errRead) {
+			sequenceMap := make(map[uuid.UUID]model.Sequence)
+			return &sequenceMap, nil
+		}
+		return nil, errRead
+	}
+
+	var sequenceMap map[uuid.UUID]model.Sequence
+	if err := json.Unmarshal(file, &sequenceMap); err != nil {
 		return nil, err
 	}
-	return &sequences.MapData, nil
+
+	return &sequenceMap, nil
 }
 
-func SaveSequence(sequence *model.Sequence) error {
-	sequences, err := getSequenceMap()
+func (r *fileSequenceRepository) SaveSequence(sequence *model.Sequence) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	sequenceMap, err := r.GetSequences()
 	if err != nil {
 		return err
 	}
-	sequences.mu.Lock()
-	defer sequences.mu.Unlock()
-	sequences.MapData[sequence.Id] = *sequence
-	err = sequences.saveMap()
-	if err != nil {
-		return err
-	}
-	return nil
+
+	(*sequenceMap)[sequence.Id] = *sequence
+
+	return r.saveMap(sequenceMap)
 }
 
-func DeleteSequence(id *uuid.UUID) error {
-	sequences, err := getSequenceMap()
-	if err != nil {
-		return err
-	}
-	sequences.mu.Lock()
-	defer sequences.mu.Unlock()
+func (r *fileSequenceRepository) DeleteSequence(id uuid.UUID) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
 
-	for key, sequence := range sequences.MapData {
-		updatedPrecedents := make([]uuid.UUID, 0)
-		for _, precID := range sequence.Precedents {
-			if precID != *id {
-				updatedPrecedents = append(updatedPrecedents, precID)
-			}
-		}
-		sequence.Precedents = updatedPrecedents
-		sequences.MapData[key] = sequence
-	}
-	delete(sequences.MapData, *id)
-	err = sequences.saveMap()
+	sequenceMap, err := r.GetSequences()
 	if err != nil {
 		return err
 	}
-	return nil
+
+	delete(*sequenceMap, id)
+
+	return r.saveMap(sequenceMap)
 }
-func DeletePrecedent(idSequence *uuid.UUID, idPrecedent *uuid.UUID) error {
-	sequences, err := getSequenceMap()
+
+func (r *fileSequenceRepository) DeletePrecedent(idSequence uuid.UUID, idPrecedent uuid.UUID) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	sequenceMap, err := r.GetSequences()
 	if err != nil {
 		return err
 	}
-	sequences.mu.Lock()
-	defer sequences.mu.Unlock()
 
-	sequence := sequences.MapData[*idSequence]
+	sequence, found := (*sequenceMap)[idSequence]
+	if !found {
+		return nil
+	}
+
 	updatedPrecedents := make([]uuid.UUID, 0)
 	for _, precID := range sequence.Precedents {
-		if precID != *idPrecedent {
+		if precID != idPrecedent {
 			updatedPrecedents = append(updatedPrecedents, precID)
 		}
 	}
+
 	sequence.Precedents = updatedPrecedents
-	sequences.MapData[*idSequence] = sequence
+	(*sequenceMap)[idSequence] = sequence
 
-	err = sequences.saveMap()
-	if err != nil {
-		return err
-	}
-	return nil
+	return r.saveMap(sequenceMap)
 }
 
-func getSequenceMap() (*SequenceMap, error) {
-	if sequenceMap == nil {
-		file, errRead := os.ReadFile(filepath.Join(configuration.Config.DataPath, configuration.Config.SequencesPath))
-		if errRead != nil {
-			if os.IsNotExist(errRead) {
-				sequenceMap = &SequenceMap{
-					MapData: make(map[uuid.UUID]model.Sequence),
-					mu:      sync.Mutex{},
-				}
-
-				jsonData, errMarshal := json.Marshal(sequenceMap)
-				if errMarshal != nil {
-					return nil, errMarshal
-				}
-
-				if errWrite := os.WriteFile(filepath.Join(configuration.Config.DataPath, configuration.Config.SequencesPath), jsonData, 0644); errWrite != nil {
-					return nil, errWrite
-				}
-
-			} else {
-				return nil, errRead
-			}
-		} else {
-			if err := json.Unmarshal(file, &sequenceMap); err != nil {
-				return nil, err
-			}
-		}
-
-	}
-	return sequenceMap, nil
-}
-
-func (s *SequenceMap) saveMap() error {
-
-	jsonData, errMarshal := json.MarshalIndent(&s, "", "  ")
+func (r *fileSequenceRepository) saveMap(sequenceMap *map[uuid.UUID]model.Sequence) error {
+	jsonData, errMarshal := json.MarshalIndent(sequenceMap, "", "  ")
 	if errMarshal != nil {
 		return errMarshal
 	}
-	if errWrite := os.WriteFile(filepath.Join(configuration.Config.DataPath, configuration.Config.SequencesPath), jsonData, 0644); errWrite != nil {
+
+	if errWrite := os.WriteFile(filepath.Join(r.dataPath, r.filePath), jsonData, 0644); errWrite != nil {
 		return errWrite
 	}
+
 	return nil
+}
+
+func GetSequenceRepository() SequenceRepository {
+	return NewFileSequenceRepository(configuration.Config.SequencesPath, configuration.Config.DataPath)
 }
