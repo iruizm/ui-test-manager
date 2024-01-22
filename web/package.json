@@ -1,5 +1,5 @@
 {
-  "name": "selenium-manager",
+  "name": "ui-test-manager",
   "version": "0.1.0",
   "private": true,
   "scripts": {
