@@ -38,6 +38,7 @@ func Run() {
 	controller := controllers.NewController(service)
 
 	backend := router.Setup(controller)
+	fmt.Println("Server running...")
 	backend.Run("localhost:" + configuration.Config.BackPort)
-	print("Server running...")
+
 }
