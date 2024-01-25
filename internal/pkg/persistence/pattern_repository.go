@@ -31,9 +31,6 @@ func NewFilePatternRepository(filePath, dataPath string) *FilePatternRepository 
 }
 
 func (r *FilePatternRepository) GetPatterns() (*map[uuid.UUID]model.Pattern, error) {
-	r.mu.Lock()
-	defer r.mu.Unlock()
-
 	file, errRead := os.ReadFile(filepath.Join(r.dataPath, r.filePath))
 	if errRead != nil {
 		if os.IsNotExist(errRead) {
@@ -80,6 +77,11 @@ func (r *FilePatternRepository) DeletePattern(id uuid.UUID) error {
 }
 
 func (r *FilePatternRepository) saveMap(patternMap *map[uuid.UUID]model.Pattern) error {
+	if _, err := os.Stat(r.dataPath); os.IsNotExist(err) {
+		if errDir := os.MkdirAll(r.dataPath, os.ModePerm); errDir != nil {
+			return errDir
+		}
+	}
 	jsonData, errMarshal := json.MarshalIndent(patternMap, "", "  ")
 	if errMarshal != nil {
 		return errMarshal
@@ -87,6 +89,7 @@ func (r *FilePatternRepository) saveMap(patternMap *map[uuid.UUID]model.Pattern)
 
 	if errWrite := os.WriteFile(filepath.Join(r.dataPath, r.filePath), jsonData, 0644); errWrite != nil {
 		return errWrite
+
 	}
 
 	return nil

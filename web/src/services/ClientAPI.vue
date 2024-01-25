@@ -47,6 +47,7 @@ async function saveSequence(data) {
 }
 async function savePattern(data) {
   try {
+    console.log("TEST")
     await axios.post('http://localhost:8080/api/patterns', data);
     await getPatterns()
   } catch (error) {

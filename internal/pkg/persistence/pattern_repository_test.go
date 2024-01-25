@@ -14,11 +14,10 @@ func TestPatternRepository(t *testing.T) {
 	configuration.Config.DataPath = tmpDir
 
 	testPattern := &model.Pattern{
-		Name:    "Test Pattern",
-		Id:      uuid.New(),
-		Before:  "Before Test",
-		After:   "After Test",
-		Replace: true,
+		Name:   "Test Pattern",
+		Id:     uuid.New(),
+		Before: "Before Test",
+		After:  "After Test",
 	}
 
 	repo := NewFilePatternRepository(configuration.Config.PatternsPath, configuration.Config.DataPath)

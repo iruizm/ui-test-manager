@@ -115,12 +115,12 @@ func (s *Service) GetTests() ([]model.Sequence, error) {
 	}
 
 	for k, seq := range o {
+		updatedContent := seq.Content
 		for _, p := range *patterns {
-			if p.Replace {
-				seq.Content = strings.Replace(seq.Content, p.Before, p.After, -1)
-				o[k] = seq
-			}
+			updatedContent = strings.Replace(updatedContent, p.Before, p.After, -1)
 		}
+		o[k].Content = updatedContent
 	}
+
 	return o, nil
 }

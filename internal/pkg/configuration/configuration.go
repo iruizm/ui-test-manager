@@ -17,6 +17,7 @@ func SetConfig(config *Configuration) {
 }
 
 type Configuration struct {
+	RootPath      string `json:"root_path"`
 	DataPath      string `json:"data_path"`
 	ConfigPath    string `json:"config_path"`
 	SequencesPath string `json:"sequences_path"`

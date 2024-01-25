@@ -44,8 +44,6 @@
         <v-toolbar color="teal-darken-3" density="comfortable" floating>
           <v-toolbar-title>Rule</v-toolbar-title>
           <v-spacer></v-spacer>
-          <!-- <v-switch v-model="selected.mode" hide-details
-            :label="`Replace: ${selected.mode}`"></v-switch> -->
           <v-spacer></v-spacer>
           <v-tooltip text="Save" location="top">
             <template v-slot:activator="{ props }">
@@ -89,8 +87,8 @@ const tableData = computed(() => {
   return Object.values(store.patterns).map(pattern => ({
     id: pattern.id,
     name: pattern.name,
-    regex: pattern.regex,
-    replacement: pattern.replacement,
+    before: pattern.before,
+    after: pattern.after,
   }));
 });
 

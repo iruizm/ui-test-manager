@@ -20,7 +20,6 @@ func Run() {
 	}
 	configPath = filepath.Join(filepath.Dir(filepath.Dir(exeDir)), "configs", "config.json")
 
-	// Initialize the file configurator
 	fileConfigurator := &configuration.FileConfigurator{}
 	config, err := configuration.SetupConfigurator(fileConfigurator, configPath)
 	if err != nil {

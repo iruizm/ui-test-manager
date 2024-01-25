@@ -14,5 +14,4 @@ func TestNewPattern(t *testing.T) {
 	assert.NotEqual(t, uuid.Nil, p.Id, "Expected Id to be a non-zero UUID")
 	assert.Equal(t, "", p.Before, "Expected Before to be an empty string")
 	assert.Equal(t, "", p.After, "Expected After to be an empty string")
-	assert.False(t, p.Replace, "Expected Replace to be false")
 }

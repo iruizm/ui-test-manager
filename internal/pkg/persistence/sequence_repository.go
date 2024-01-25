@@ -32,14 +32,15 @@ func NewFileSequenceRepository(filePath, dataPath string) SequenceRepository {
 }
 
 func (r *fileSequenceRepository) GetSequences() (*map[uuid.UUID]model.Sequence, error) {
-	r.mu.Lock()
-	defer r.mu.Unlock()
-
-	file, errRead := os.ReadFile(filepath.Join(r.dataPath, r.filePath))
+	filePath := filepath.Join(r.dataPath, r.filePath)
+	file, errRead := os.ReadFile(filePath)
 	if errRead != nil {
 		if os.IsNotExist(errRead) {
-			sequenceMap := make(map[uuid.UUID]model.Sequence)
-			return &sequenceMap, nil
+			emptyMap := make(map[uuid.UUID]model.Sequence)
+			if errWrite := r.saveMap(&emptyMap); errWrite != nil {
+				return nil, errWrite
+			}
+			return &emptyMap, nil
 		}
 		return nil, errRead
 	}
@@ -51,7 +52,6 @@ func (r *fileSequenceRepository) GetSequences() (*map[uuid.UUID]model.Sequence, 
 
 	return &sequenceMap, nil
 }
-
 func (r *fileSequenceRepository) SaveSequence(sequence *model.Sequence) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
@@ -108,6 +108,12 @@ func (r *fileSequenceRepository) DeletePrecedent(idSequence uuid.UUID, idPrecede
 }
 
 func (r *fileSequenceRepository) saveMap(sequenceMap *map[uuid.UUID]model.Sequence) error {
+	if _, err := os.Stat(r.dataPath); os.IsNotExist(err) {
+		if errDir := os.MkdirAll(r.dataPath, os.ModePerm); errDir != nil {
+			return errDir
+		}
+	}
+
 	jsonData, errMarshal := json.MarshalIndent(sequenceMap, "", "  ")
 	if errMarshal != nil {
 		return errMarshal
