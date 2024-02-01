@@ -6,6 +6,7 @@ import (
 	"ui-test-manager/internal/pkg/model"
 
 	"github.com/google/uuid"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestPatternRepository(t *testing.T) {
@@ -23,32 +24,23 @@ func TestPatternRepository(t *testing.T) {
 	repo := NewFilePatternRepository(configuration.Config.PatternsPath, configuration.Config.DataPath)
 
 	t.Run("SavePattern and GetPatterns", func(t *testing.T) {
-		if err := repo.SavePattern(testPattern); err != nil {
-			t.Fatalf("Failed to save pattern: %v", err)
-		}
+		err := repo.SavePattern(testPattern)
+		assert.NoError(t, err)
 
 		patterns, err := repo.GetPatterns()
-		if err != nil {
-			t.Fatalf("Failed to get patterns: %v", err)
-		}
+		assert.NoError(t, err)
 
-		if _, ok := (*patterns)[testPattern.Id]; !ok {
-			t.Errorf("Saved pattern not found in retrieved patterns")
-		}
+		assert.NotNil(t, patterns)
+		assert.Contains(t, *patterns, testPattern.Id, "Saved pattern not found in retrieved patterns")
 	})
 
 	t.Run("DeletePattern", func(t *testing.T) {
-		if err := repo.DeletePattern(testPattern.Id); err != nil {
-			t.Fatalf("Failed to delete pattern: %v", err)
-		}
+		err := repo.DeletePattern(testPattern.Id)
+		assert.NoError(t, err)
 
 		patterns, err := repo.GetPatterns()
-		if err != nil {
-			t.Fatalf("Failed to get patterns: %v", err)
-		}
+		assert.NoError(t, err)
 
-		if _, ok := (*patterns)[testPattern.Id]; ok {
-			t.Errorf("Deleted pattern found in retrieved patterns")
-		}
+		assert.NotContains(t, *patterns, testPattern.Id, "Deleted pattern found in retrieved patterns")
 	})
 }

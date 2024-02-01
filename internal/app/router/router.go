@@ -48,6 +48,9 @@ func Setup(controller *controller.Controller) *gin.Engine {
 	app.DELETE("/api/patterns/:id", controller.DeletePattern)
 	app.DELETE("/api/sequences/:id/:idPrecedent", controller.DeletePrecedent)
 
+	app.GET("/api/health", func(c *gin.Context) {
+		c.JSON(200, gin.H{"status": "ok"})
+	})
 	// ================== Docs Routes
 	app.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
