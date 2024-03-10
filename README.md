@@ -12,5 +12,5 @@ Webapp developed to make the design of ui-testing plans and performing of bulk o
 Apache 2
 
 ## Project status
-Currently under development
+Under development, functional
 
